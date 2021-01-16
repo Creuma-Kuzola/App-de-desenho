@@ -5,6 +5,10 @@
  */
 package applicacao.de.desenho;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.PopupMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 /**
@@ -13,6 +17,13 @@ import javax.swing.JPanel;
  */
 public class PainelAplicacao extends JPanel {
     
+    JMenuBar menuBar = new JMenuBar();
     
+    public PainelAplicacao()
+    { 
     
+    } 
+    
+       
+
 }

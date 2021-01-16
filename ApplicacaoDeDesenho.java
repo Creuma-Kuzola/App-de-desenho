@@ -8,6 +8,8 @@ package applicacao.de.desenho;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 
 /**
  *
@@ -16,9 +18,10 @@ import javax.swing.JFrame;
 public class ApplicacaoDeDesenho {
 
     /**
-     * @param args the command line arguments
+     * @return 
      */
-     public static int larguraDimensaoDaTela(){
+    
+    public static int larguraDimensaoDaTela(){
         
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension tamanhoTela = kit.getScreenSize();   
@@ -34,18 +37,36 @@ public class ApplicacaoDeDesenho {
     }
 
     
+    public static void criarMenuBar()
+    { 
+    
+        JFrame frame = new JFrame("Aplicação de desenho");
+        //PainelAplicacao painel = new PainelAplicacao();
+        frame.setSize(larguraDimensaoDaTela()/2, alturaDimensaoDaTela()/2);
+        //frame.setSize(500,500);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        
+        JMenuBar menuBar = new JMenuBar();
+        frame.setJMenuBar(menuBar);
+        
+        JMenu file = new JMenu("File");
+        menuBar.add(file);
+        
+        JMenu cvcv = new JMenu("Bla bla");
+        menuBar.add(cvcv);
+      
+        //frame.add(painel);
+
+    
+    }        
+    
     public static void main(String[] args) {
         // TODO code application logic here
         
-        JFrame frame = new JFrame("Sol com gradiente e detalhes");
-        PainelAplicacao painel = new PainelAplicacao();
-        
-        frame.setSize(larguraDimensaoDaTela()/2, alturaDimensaoDaTela()/2);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(painel);
-
+        criarMenuBar();
+       
     }
     
 }
