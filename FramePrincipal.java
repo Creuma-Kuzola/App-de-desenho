@@ -7,12 +7,17 @@ package applicacao.de.desenho;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
 
 /**
  *
@@ -25,6 +30,10 @@ public class FramePrincipal extends JFrame {
     JMenuBar menuBar = new JMenuBar();
     JMenu file = new JMenu("File");
     
+    Cursor cursor = new Cursor(Cursor.HAND_CURSOR);
+    Border border = new LineBorder(new Color(173,173,173), 1);
+    Font font = new Font("Sans-Serif", Font.BOLD, 12);
+    
     public FramePrincipal()
     {
         
@@ -35,18 +44,12 @@ public class FramePrincipal extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setLayout(new BorderLayout());
-        
-        painelPrincipal.setBackground(Color.red);
-        this.add(painelPrincipal,BorderLayout.NORTH);
+        adicionarMenu();
+
+        /*painelPrincipal.setBackground(Color.red);
+        this.add(painelPrincipal,BorderLayout.NORTH);*/
     }
     
-    public void criarPainelPrincipal()
-    {
-        
-        
-        
-    }        
-  
     public static int larguraDimensaoDaTela(){
         
         Toolkit kit = Toolkit.getDefaultToolkit();
@@ -61,6 +64,20 @@ public class FramePrincipal extends JFrame {
         return tamanhoTela.height;
      
     }
+
+    
+    public void adicionarMenu()
+    {
+        
+        menuBar.setBorder(border);
+        menuBar.setBackground(new Color(211,211,211));
+        menuBar.setPreferredSize(new Dimension(larguraDimensaoDaTela(),30));
+        file.setCursor(cursor);
+        file.setFont(font);
+        menuBar.add(file);
+        this.setJMenuBar(menuBar);
+    }        
+  
 
 
     
