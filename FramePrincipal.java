@@ -13,6 +13,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.IOException;
@@ -47,7 +49,8 @@ public class FramePrincipal extends JFrame {
     
     JButton botaoSeta = new JButton();
     JLabel labelSeta = new JLabel();
-            
+    JLabel labelLapis = new JLabel();
+    JLabel labelBorracha = new JLabel();       
             
     
     public FramePrincipal() throws IOException
@@ -103,32 +106,19 @@ public class FramePrincipal extends JFrame {
        
     }       
     
-    /*public void adicionarIcones() throws IOException{
-        
-       // Image img = ImageIO.read(getClass().getResource("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/imagens/diagonal-arrow(1).png"));
-       
-       Icon icon = new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/imagens/diagonal-arrow(1).png");
-       JButton button7 = new JButton(icon);
-       
-       /* Icon seta = new ImageIcon(Main.class.getResource("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/imagens/diagonal-arrow(1).png"));
-        //botaoSeta.setImage(new ImageIcon("seta",arrow));
-        //botaoSeta.setIcon(new ImageIcon(img));
-       // painelIcones.add(button7);
-                
-    }*/
-    
     public void adicionarIconeNoPainelLateral()
     {
         labelSeta.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/diagonal-arrow1.png"));
-        labelSeta.setBackground(Color.red);
-        //this.add(labelSeta,BorderLayout.EAST);
-        //painelIcones.add(labelSeta);
-
+        labelLapis.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/draw.png"));
+        labelBorracha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/rubber1.png"));
         
         painelIcones.setBackground(new Color(211,211,211));
         painelIcones.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
+        //painelIcones.setLayout(new GridLayout(3,0,0,0));
         painelIcones.setBorder(border2);
         painelIcones.add(labelSeta);
+        painelIcones.add(labelLapis);
+        painelIcones.add(labelBorracha);
         this.add(painelIcones,BorderLayout.WEST);
         
        validate();
