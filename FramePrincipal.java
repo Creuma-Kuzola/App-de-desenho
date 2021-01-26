@@ -103,7 +103,7 @@ public class FramePrincipal extends JFrame {
         painelIcones.setBackground(new Color(211,211,211));
         painelIcones.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
         painelIcones.setBorder(border2);
-        painelIcones.setLayout(null);
+        painelIcones.setLayout(new GridLayout(13,0,1,0));
         this.add(painelIcones,BorderLayout.WEST);
     }       
     
@@ -114,7 +114,6 @@ public class FramePrincipal extends JFrame {
         
         labelLapis.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/draw.png"));
         labelLapis.setCursor(cursor);
-        labelLapis.setLocation(50,200);
        
         labelBorracha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/rubber1.png"));
         labelBorracha.setCursor(cursor);     
