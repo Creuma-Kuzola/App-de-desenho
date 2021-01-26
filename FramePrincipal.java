@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
@@ -88,7 +89,6 @@ public class FramePrincipal extends JFrame {
 
     public void adicionarMenu()
     {
-        
         menuBar.setBorder(border1);
         menuBar.setBackground(new Color(211,211,211));
         menuBar.setPreferredSize(new Dimension(larguraDimensaoDaTela(),30));
@@ -103,16 +103,22 @@ public class FramePrincipal extends JFrame {
         painelIcones.setBackground(new Color(211,211,211));
         painelIcones.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
         painelIcones.setBorder(border2);
+        painelIcones.setLayout(null);
         this.add(painelIcones,BorderLayout.WEST);
-       
     }       
     
     public void adicionarIconeNoPainelLateral()
     {
         labelSeta.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/diagonal-arrow1.png"));
+        labelSeta.setCursor(cursor);
+        
         labelLapis.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/draw.png"));
+        labelLapis.setCursor(cursor);
+        labelLapis.setLocation(50,200);
+       
         labelBorracha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/rubber1.png"));
-                
+        labelBorracha.setCursor(cursor);     
+        
         painelIcones.add(labelSeta);
         painelIcones.add(labelLapis);
         painelIcones.add(labelBorracha);
