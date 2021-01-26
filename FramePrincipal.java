@@ -65,8 +65,9 @@ public class FramePrincipal extends JFrame {
         this.setLayout(new BorderLayout());
         
         adicionarMenu(); 
+        adicionarPainelIcones();
         adicionarIconeNoPainelLateral();
-       // adicionarPainelIcones();
+        
         
     }
     
@@ -102,7 +103,7 @@ public class FramePrincipal extends JFrame {
         painelIcones.setBackground(new Color(211,211,211));
         painelIcones.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
         painelIcones.setBorder(border2);
-       // this.add(painelIcones,BorderLayout.WEST);
+        this.add(painelIcones,BorderLayout.WEST);
        
     }       
     
@@ -111,17 +112,12 @@ public class FramePrincipal extends JFrame {
         labelSeta.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/diagonal-arrow1.png"));
         labelLapis.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/draw.png"));
         labelBorracha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/rubber1.png"));
-        
-        painelIcones.setBackground(new Color(211,211,211));
-        painelIcones.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
-        //painelIcones.setLayout(new GridLayout(3,0,0,0));
-        painelIcones.setBorder(border2);
+                
         painelIcones.add(labelSeta);
         painelIcones.add(labelLapis);
         painelIcones.add(labelBorracha);
-        this.add(painelIcones,BorderLayout.WEST);
         
-       validate();
+        validate();
     }        
     
 }
