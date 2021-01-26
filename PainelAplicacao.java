@@ -7,7 +7,9 @@ package applicacao.de.desenho;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.PopupMenu;
+import java.awt.Toolkit;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
@@ -16,14 +18,15 @@ import javax.swing.JPanel;
  * @author creuma
  */
 public class PainelAplicacao extends JPanel {
-    
-    JMenuBar menuBar = new JMenuBar();
-    
+      
     public PainelAplicacao()
     { 
-    
+        this.setSize(30,100);
+        this.setBackground(Color.MAGENTA);
+        
+        
     } 
     
        
-
+    
 }
