@@ -17,6 +17,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -36,7 +39,7 @@ import javax.swing.border.LineBorder;
  *
  * @author creuma
  */
-public class FramePrincipal extends JFrame {
+public class FramePrincipal extends JFrame implements MouseListener, MouseMotionListener{
     
     JPanel painelPrincipal = new JPanel();
     JPanel painelIcones = new JPanel();
@@ -64,11 +67,13 @@ public class FramePrincipal extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setLayout(new BorderLayout());
+        this.addMouseMotionListener(this);
+        this.addMouseListener(this);
         
         adicionarMenu(); 
         adicionarPainelIcones();
         adicionarIconeNoPainelLateral();
-        
+        //escutarPainel();
         
     }
     
@@ -120,9 +125,78 @@ public class FramePrincipal extends JFrame {
         
         painelIcones.add(labelSeta);
         painelIcones.add(labelLapis);
-        painelIcones.add(labelBorracha);
+        painelIcones.add(labelBorracha); 
         
         validate();
     }        
     
+    
+   /* public void escutarPainel()
+    {
+    
+        painelIcones.addMouseMotionListener(new MouseMotionListener(){
+            
+            public void mouseClicked(MouseEvent arg0) {
+                 
+                labelLapis.setForeground(Color.GRAY);
+                System.out.println("Cliquei o mouse");
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent arg0) {
+                
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent arg0) {
+                labelLapis.setBackground(Color.GRAY);
+                 System.out.println("Movi o mouse");
+            }
+
+    });
+    }   */
+
+    @Override
+    public void mouseClicked(MouseEvent arg0) {
+        
+        System.out.println("Cliquei no mouse");
+    }
+
+    @Override
+    public void mousePressed(MouseEvent arg0) {
+     
+        System.out.println("Pressionei o o mouse");
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent arg0) {
+        
+        System.out.println("Relead  o mouse");
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent arg0) {
+     
+        System.out.println("Entrei no mouse");
+    }
+
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+     
+        System.out.println("Saí do mouse");
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent arg0) {
+        
+        System.out.println("Dragged o mouse");
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent arg0) {
+        
+        System.out.println("Movi o mouse");
+    }
+
+
 }
