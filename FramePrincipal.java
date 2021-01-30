@@ -43,6 +43,7 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
     
     JPanel painelPrincipal = new JPanel();
     JPanel painelIcones = new JPanel();
+    JPanel painelDeDesenho = new JPanel();
     JMenuBar menuBar = new JMenuBar();
     JMenu file = new JMenu("File");
     
@@ -50,11 +51,13 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
     Border border1 = new LineBorder(new Color(173,173,173), 1);
     Border border2 = new LineBorder(new Color(173,173,173), 1);
     Font font = new Font("Sans-Serif", Font.BOLD, 12);
-    
-    JButton botaoSeta = new JButton();
+   
     JLabel labelSeta = new JLabel();
     JLabel labelLapis = new JLabel();
     JLabel labelBorracha = new JLabel();    
+    JLabel labelLinha = new JLabel();  
+    JLabel labelTexto = new JLabel();  
+    JLabel labelPincel = new JLabel();  
     
     boolean flagLabelLapis = false;
             
@@ -64,7 +67,7 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         
         this.setTitle("Aplicação de desenho");
         this.setSize(larguraDimensaoDaTela(), alturaDimensaoDaTela());
-        this.getContentPane().setBackground(new Color(255,255,255));
+        this.getContentPane().setBackground(new Color(211,211,211));
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
@@ -74,10 +77,13 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         
         adicionarMenu(); 
         adicionarPainelIcones();
-        adicionarIconeNoPainelLateral();
+        adicionarIconesNoPainelIcones();
         adicionarCorDeFundoNaLabelLapis();
         adicionarCorDeFundoNaLabelBorracha();
         adicionarCorDeFundoNaLabelSeta();
+        adicionarCorDeFundoNaLabelLinha();
+        adicionarCorDeFundoNaLabelPincel();
+        adicionarCorDeFundoNaLabelTexto();
         
     }
     
@@ -116,7 +122,7 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         this.add(painelIcones,BorderLayout.WEST);
     }       
     
-    public void adicionarIconeNoPainelLateral()
+    public void adicionarIconesNoPainelIcones()
     {
         labelSeta.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/diagonal-arrow1.png"));
         labelSeta.setCursor(cursor);
@@ -127,10 +133,22 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         labelBorracha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/rubber1.png"));
         labelBorracha.setCursor(cursor);     
         
+        labelLinha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/diagonal-line3.png"));
+        labelLinha.setCursor(cursor);     
+        
+        labelTexto.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/text.png"));
+        labelTexto.setCursor(cursor);   
+        
+        labelPincel.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/paint-brush.png"));
+        labelPincel.setCursor(cursor); 
+        
         painelIcones.add(labelSeta);
         painelIcones.add(labelLapis);
+        painelIcones.add(labelPincel); 
         painelIcones.add(labelBorracha); 
-        
+        painelIcones.add(labelTexto); 
+        painelIcones.add(labelLinha); 
+   
         validate();
     }     
     
@@ -160,7 +178,6 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
                 
                 labelLapis.setOpaque(true);
                 labelLapis.setBackground(Color.GRAY);
-                System.out.println("Entrei na Label");
             }
 
             @Override
@@ -168,7 +185,6 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
                 
                 labelLapis.setOpaque(true);
                 labelLapis.setBackground(new Color(211,211,211));
-                System.out.println("Entrei na Label");
             }
           
         });
@@ -184,7 +200,6 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
             @Override
             public void mouseClicked(MouseEvent arg0) {
                
-               // flagLabelLapis = true;
             }
 
             @Override
@@ -215,7 +230,8 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         
     }  
     
-        public void adicionarCorDeFundoNaLabelBorracha()
+    
+    public void adicionarCorDeFundoNaLabelBorracha()
     {
         
         labelBorracha.addMouseListener(new MouseListener(){
@@ -241,7 +257,6 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
                 
                 labelBorracha.setOpaque(true);
                 labelBorracha.setBackground(Color.GRAY);
-                System.out.println("Entrei na Label");
             }
 
             @Override
@@ -249,17 +264,132 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
                 
                 labelBorracha.setOpaque(true);
                 labelBorracha.setBackground(new Color(211,211,211));
-                System.out.println("Entrei na Label");
             }
           
         });
         
     } 
     
+    
+    public void adicionarCorDeFundoNaLabelPincel()
+    {
+        
+        labelPincel.addMouseListener(new MouseListener(){
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+               
+                //flagLabelLapis = true;
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+        
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                
+                labelPincel.setOpaque(true);
+                labelPincel.setBackground(Color.GRAY);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                
+                labelPincel.setOpaque(true);
+                labelPincel.setBackground(new Color(211,211,211));
+            }
+          
+        });
+        
+    } 
+
+    public void adicionarCorDeFundoNaLabelLinha()
+    {
+        
+        labelLinha.addMouseListener(new MouseListener(){
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+              
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+        
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                
+                labelLinha.setOpaque(true);
+                labelLinha.setBackground(Color.GRAY);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                
+                labelLinha.setOpaque(true);
+                labelLinha.setBackground(new Color(211,211,211));
+            }
+          
+        });
+        
+    } 
+    
+    public void adicionarCorDeFundoNaLabelTexto()
+    {
+        
+        labelTexto.addMouseListener(new MouseListener(){
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+              
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+        
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                
+                labelTexto.setOpaque(true);
+                labelTexto.setBackground(Color.GRAY);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                
+                labelTexto.setOpaque(true);
+                labelTexto.setBackground(new Color(211,211,211));
+            }
+          
+        });
+        
+    } 
+
+    
     @Override
     public void mouseClicked(MouseEvent e) {
         
-        System.out.println("Cliquei no mouse");
     }
 
     @Override
@@ -272,19 +402,16 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
     @Override
     public void mouseReleased(MouseEvent e) {
         
-        System.out.println("Relead  o mouse");
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
      
-        System.out.println("Entrei no mouse");
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
      
-        System.out.println("Saí do mouse");
     }
 
     @Override
