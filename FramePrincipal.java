@@ -75,8 +75,9 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         adicionarMenu(); 
         adicionarPainelIcones();
         adicionarIconeNoPainelLateral();
-        //escutarPainel();
-        mudarACorDaLabel();
+        adicionarCorDeFundoNaLabelLapis();
+        adicionarCorDeFundoNaLabelBorracha();
+        adicionarCorDeFundoNaLabelSeta();
         
     }
     
@@ -133,8 +134,7 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         validate();
     }     
     
-    
-    public void mudarACorDaLabel()
+    public void adicionarCorDeFundoNaLabelLapis()
     {
         
         labelLapis.addMouseListener(new MouseListener(){
@@ -153,7 +153,6 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
             @Override
             public void mouseReleased(MouseEvent arg0) {
                 
-               
             }
 
             @Override
@@ -174,7 +173,88 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
           
         });
         
+    }
+    
+    
+    public void adicionarCorDeFundoNaLabelSeta()
+    {
+        
+        labelSeta.addMouseListener(new MouseListener(){
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+               
+               // flagLabelLapis = true;
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+        
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                
+                labelSeta.setOpaque(true);
+                labelSeta.setBackground(Color.GRAY);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                
+                labelSeta.setOpaque(true);
+                labelSeta.setBackground(new Color(211,211,211));
+            }
+          
+        });
+        
     }  
+    
+        public void adicionarCorDeFundoNaLabelBorracha()
+    {
+        
+        labelBorracha.addMouseListener(new MouseListener(){
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+               
+                //flagLabelLapis = true;
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+        
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                
+                labelBorracha.setOpaque(true);
+                labelBorracha.setBackground(Color.GRAY);
+                System.out.println("Entrei na Label");
+            }
+
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                
+                labelBorracha.setOpaque(true);
+                labelBorracha.setBackground(new Color(211,211,211));
+                System.out.println("Entrei na Label");
+            }
+          
+        });
+        
+    } 
     
     @Override
     public void mouseClicked(MouseEvent e) {
