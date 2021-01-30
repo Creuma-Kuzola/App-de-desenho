@@ -131,84 +131,8 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         painelIcones.add(labelBorracha); 
         
         validate();
-    }        
+    }     
     
-    
-   /* public void escutarPainel()
-    {
-    
-        painelIcones.addMouseMotionListener(new MouseMotionListener(){
-            
-            public void mouseClicked(MouseEvent arg0) {
-                 
-                labelLapis.setForeground(Color.GRAY);
-                System.out.println("Cliquei o mouse");
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent arg0) {
-                
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent arg0) {
-                labelLapis.setBackground(Color.GRAY);
-                 System.out.println("Movi o mouse");
-            }
-
-    });
-    }   */
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        
-        System.out.println("Cliquei no mouse");
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        
-       /* desenharOvalLivremente(e);*/
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        
-        System.out.println("Relead  o mouse");
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-     
-        System.out.println("Entrei no mouse");
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-     
-        System.out.println("Saí do mouse");
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        
-       
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        
-       /* System.out.println("Movi o mouse");*/
-    }
-
-    
-    public void desenharOvalLivremente(MouseEvent e)
-    {
-        Graphics g = getGraphics ();  
-        g.setColor (Color.BLUE);  
-        g.fillOval (e.getX (), e.getY (), 10, 10 );
-    }        
-
     
     public void mudarACorDaLabel()
     {
@@ -217,32 +141,13 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                
-                System.out.println("Clique na  na label");
-                
-                labelLapis.addMouseMotionListener(new MouseMotionListener(){
-                    
-                    @Override
-                    public void mouseDragged(MouseEvent e) {
-                        flagLabelLapis = true;
-                        desenharOvalLivremente(e);
-                        System.out.println("Dragged na label");
-                    }
-
-                    @Override
-                    public void mouseMoved(MouseEvent arg0) {
-
-                    }
-                
-                
-                });
-             
+               
+                flagLabelLapis = true;
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if(!flagLabelLapis)
-                     desenharOvalLivremente(e);
+        
             }
 
             @Override
@@ -269,10 +174,58 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
           
         });
         
+    }  
+    
+    @Override
+    public void mouseClicked(MouseEvent e) {
         
-        
-        
-    }        
+        System.out.println("Cliquei no mouse");
+    }
 
+    @Override
+    public void mousePressed(MouseEvent e) {
+        
+       if(flagLabelLapis)
+          desenharOvalLivremente(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        
+        System.out.println("Relead  o mouse");
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+     
+        System.out.println("Entrei no mouse");
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+     
+        System.out.println("Saí do mouse");
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        
+       if(flagLabelLapis)
+          desenharOvalLivremente(e);
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
+    }
+
+    
+    public void desenharOvalLivremente(MouseEvent e)
+    {
+        Graphics g = getGraphics ();  
+        g.setColor (Color.BLUE);  
+        g.fillOval (e.getX (), e.getY (), 10, 10 );
+    }        
 
 }
