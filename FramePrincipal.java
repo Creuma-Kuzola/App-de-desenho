@@ -54,7 +54,9 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
     JButton botaoSeta = new JButton();
     JLabel labelSeta = new JLabel();
     JLabel labelLapis = new JLabel();
-    JLabel labelBorracha = new JLabel();       
+    JLabel labelBorracha = new JLabel();    
+    
+    boolean flagLabelLapis = false;
             
     
     public FramePrincipal() throws IOException
@@ -74,6 +76,7 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         adicionarPainelIcones();
         adicionarIconeNoPainelLateral();
         //escutarPainel();
+        mudarACorDaLabel();
         
     }
     
@@ -157,46 +160,119 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
     }   */
 
     @Override
-    public void mouseClicked(MouseEvent arg0) {
+    public void mouseClicked(MouseEvent e) {
         
         System.out.println("Cliquei no mouse");
     }
 
     @Override
-    public void mousePressed(MouseEvent arg0) {
-     
-        System.out.println("Pressionei o o mouse");
+    public void mousePressed(MouseEvent e) {
+        
+       /* desenharOvalLivremente(e);*/
     }
 
     @Override
-    public void mouseReleased(MouseEvent arg0) {
+    public void mouseReleased(MouseEvent e) {
         
         System.out.println("Relead  o mouse");
     }
 
     @Override
-    public void mouseEntered(MouseEvent arg0) {
+    public void mouseEntered(MouseEvent e) {
      
         System.out.println("Entrei no mouse");
     }
 
     @Override
-    public void mouseExited(MouseEvent arg0) {
+    public void mouseExited(MouseEvent e) {
      
         System.out.println("Saí do mouse");
     }
 
     @Override
-    public void mouseDragged(MouseEvent arg0) {
+    public void mouseDragged(MouseEvent e) {
         
-        System.out.println("Dragged o mouse");
+       
     }
 
     @Override
-    public void mouseMoved(MouseEvent arg0) {
+    public void mouseMoved(MouseEvent e) {
         
-        System.out.println("Movi o mouse");
+       /* System.out.println("Movi o mouse");*/
     }
+
+    
+    public void desenharOvalLivremente(MouseEvent e)
+    {
+        Graphics g = getGraphics ();  
+        g.setColor (Color.BLUE);  
+        g.fillOval (e.getX (), e.getY (), 10, 10 );
+    }        
+
+    
+    public void mudarACorDaLabel()
+    {
+        
+        labelLapis.addMouseListener(new MouseListener(){
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                
+                System.out.println("Clique na  na label");
+                
+                labelLapis.addMouseMotionListener(new MouseMotionListener(){
+                    
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        flagLabelLapis = true;
+                        desenharOvalLivremente(e);
+                        System.out.println("Dragged na label");
+                    }
+
+                    @Override
+                    public void mouseMoved(MouseEvent arg0) {
+
+                    }
+                
+                
+                });
+             
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if(!flagLabelLapis)
+                     desenharOvalLivremente(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+                
+               
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                
+                labelLapis.setOpaque(true);
+                labelLapis.setBackground(Color.GRAY);
+                System.out.println("Entrei na Label");
+            }
+
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                
+                labelLapis.setOpaque(true);
+                labelLapis.setBackground(new Color(211,211,211));
+                System.out.println("Entrei na Label");
+            }
+          
+        });
+        
+        
+        
+        
+    }        
 
 
 }
