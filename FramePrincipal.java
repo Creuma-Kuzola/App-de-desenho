@@ -5,21 +5,20 @@
  */
 package applicacao.de.desenho;
 
-import com.sun.tools.javac.Main;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GridBagLayout;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -34,18 +33,16 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
+
 
 /**
  *
  * @author creuma
  */
-public class FramePrincipal extends JFrame implements MouseListener, MouseMotionListener{
+public class FramePrincipal extends JFrame implements ActionListener, MouseListener, MouseMotionListener{
     
-    JPanel painelPrincipal = new JPanel();
     JPanel painelIcones = new JPanel();
     JPanel painelDeDesenho = new JPanel();
  
@@ -66,10 +63,13 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
     
     JButton botaoBaldeDeTinta = new JButton();  
     
-    boolean flagDeDesenhoLabelLapis = false;
-            
-    Color cor;
+    boolean flagDeDesenhoLabelSeta, flagDeDesenhoLabelLapis, flagDeDesenhoLabelPincel
+            ,flagDeDesenhoLabelBorracha, flagDeDesenhoLabelTexto,flagDeDesenhoLabelLinha
+            ,flagDeDesenhoBotaoBaldeDeTinta;
     
+    Color cor;
+    int posXInicial, posYInicial,posXFinal, posYFinal, numClique; 
+     
     public FramePrincipal() throws IOException
     {
         
@@ -80,27 +80,33 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setLayout(new BorderLayout());
-        this.addMouseMotionListener(this);
-        this.addMouseListener(this);
-       
+      
         adicionarMenu(); 
         adicionarPainelIcones();
         adicionarPainelDeDesenho();
         
+        
         adicionarIconesNoPainelIcones();
         
-        efeitoHoverNaLabel(labelSeta);
-        efeitoHoverNaLabel(labelBorracha);
-        efeitoHoverNaLabel(labelLapis);
-        efeitoHoverNaLabel(labelLinha);
-        efeitoHoverNaLabel(labelPincel);
-        efeitoHoverNaLabel(labelTexto);
+        efeitoHoverDaLabel(labelSeta);
+        efeitoHoverDaLabel(labelBorracha);
+        efeitoHoverDaLabel(labelLapis);
+        efeitoHoverDaLabel(labelLinha);
+        efeitoHoverDaLabel(labelPincel);
+        efeitoHoverDaLabel(labelTexto);
         
-        efeitoHoverNoBotao(botaoBaldeDeTinta);
-        //efeitoHoverNaLabel(labelBaldeDeTinta);
+        efeitoHoverDoBotao(botaoBaldeDeTinta);
+        
+        escutarEventoNaLabelSeta();
+        escutarEventoNaLabelLapis();
+        escutarEventoNaLabelPincel();
+        escutarEventoNaLabelBorracha();
+        escutarEventoNaLabelTexto();
+        escutarEventoNaLabelLinha();
+        escutarEventoNoBotaoBaldeDeTinta();
         
         desenharAposCliqueLabelLapis();
-        
+        //desenharNoPainelDeDesenho();
     }
     
     public static int larguraDimensaoDaTela(){
@@ -141,9 +147,20 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
     public void adicionarPainelDeDesenho()
     {
         painelDeDesenho.setBackground(new Color(255,255,255));
+        painelDeDesenho.addMouseListener(this);
+        painelDeDesenho.addMouseMotionListener(this);
         painelDeDesenho.setPreferredSize(new Dimension(300,300));
         this.add(painelDeDesenho,BorderLayout.CENTER);
-
+    }        
+    
+    public void fazerBotaoParecerLabel(JButton botao)
+    {
+        botao.setFocusPainted(false);
+        botao.setMargin(new Insets(0, 0, 0, 0));
+        botao.setContentAreaFilled(false);
+        botao.setBorderPainted(false);
+        botao.setOpaque(false);
+        botao.addActionListener(this);
     }        
     
     public void adicionarIconesNoPainelIcones()
@@ -167,14 +184,9 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         labelPincel.setCursor(cursor); 
         
         
-        botaoBaldeDeTinta.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/paint-bucket1.png"));
-        botaoBaldeDeTinta.setFocusPainted(false);
-        botaoBaldeDeTinta.setMargin(new Insets(0, 0, 0, 0));
-        botaoBaldeDeTinta.setContentAreaFilled(false);
-        botaoBaldeDeTinta.setBorderPainted(false);
-        botaoBaldeDeTinta.setOpaque(false);
-        
+        botaoBaldeDeTinta.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/paint-bucket1.png"));        
         botaoBaldeDeTinta.setCursor(cursor); 
+        fazerBotaoParecerLabel(botaoBaldeDeTinta);
                 
         painelIcones.add(labelSeta);
         painelIcones.add(labelLapis);
@@ -187,27 +199,11 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         validate();
     }     
     
-    public void efeitoHoverNaLabel(JLabel label)
+    public void efeitoHoverDaLabel(JLabel label)
     {
         
-        label.addMouseListener(new MouseListener(){
+        label.addMouseListener(new MouseAdapter(){
             
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-               
-                flagDeDesenhoLabelLapis = true;
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-        
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent arg0) {
-                
-            }
-
             @Override
             public void mouseEntered(MouseEvent arg0) {
                 
@@ -223,29 +219,14 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
             }
           
         });
-        
+       
     }
     
-    public void efeitoHoverNoBotao(JButton botao)
+    public void efeitoHoverDoBotao(JButton botao)
     {
         
-        botao.addMouseListener(new MouseListener(){
+        botao.addMouseListener(new MouseAdapter(){
             
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-               
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-        
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent arg0) {
-                
-            }
-
             @Override
             public void mouseEntered(MouseEvent arg0) {
                 
@@ -263,23 +244,95 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
         });
         
     }
+
     
-    /*public void escolherCor()
+    public void pegarClique(int numClique)
     {
+    
+        switch(numClique){
         
-        labelBaldeDeTinta.addMouseListener(new MouseListener(){
+            case 1:
+                flagDeDesenhoLabelSeta = true;
+                break;
+            case 2:
+                flagDeDesenhoLabelLapis=true;
+                break;
+            case 3:
+                flagDeDesenhoLabelPincel = true;
+                break;
+            case 4:
+                flagDeDesenhoLabelBorracha = true;
+                break;
+            case 5:
+                flagDeDesenhoLabelTexto = true;
+                break;
+            case 6:
+                flagDeDesenhoLabelLinha = true;
+                break;
+            case 7:
+                flagDeDesenhoBotaoBaldeDeTinta = true;
+                break;
+               
+        }
+    
+    }
+    
+        
+    public void desenharOvalLivremente(MouseEvent e, Color cor)
+    {
+       Graphics2D g2d = (Graphics2D) getGraphics (); 
+       int xActual = e.getX ();
+       int yActual = e.getY();
+       
+       g2d.setColor (cor);  
+       g2d.drawLine(e.getX (), e.getY (), 5, 5);
+    }    
+
+    
+   
+    public void desenharAposCliqueLabelLapis()
+    {
+    
+        painelDeDesenho.addMouseMotionListener(new MouseAdapter() {
             
             @Override
-            public void mouseClicked(MouseEvent arg0) {
-               
-              Color corDeInicio = Color.RED;
-            /*cor = JColorChooser.showDialog(this,"Escolha uma cor", corDeInicio);*/
-
-            /*}
-
+            public void mouseDragged(MouseEvent e) {
+                  if(flagDeDesenhoLabelLapis)
+                     desenharOvalLivremente(e,cor);
+            }
             
+            @Override
             public void mousePressed(MouseEvent e) {
-        
+                
+                if(flagDeDesenhoLabelLapis)
+                     desenharOvalLivremente(e,cor);
+            }
+
+
+        });    
+  }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+    
+        if(e.getSource() == botaoBaldeDeTinta)
+        {
+            cor = JColorChooser.showDialog(this,"Escolha uma cor",Color.BLACK);
+        }
+    }
+
+
+    /*public void desenharNoPainelDeDesenho(){
+    
+        painelDeDesenho.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                 
+            }
+
+            @Override
+            public void mousePressed(MouseEvent arg0) {
+
             }
 
             @Override
@@ -289,35 +342,24 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
 
             @Override
             public void mouseEntered(MouseEvent arg0) {
-                
+               
             }
 
             @Override
             public void mouseExited(MouseEvent arg0) {
-                
-           }
-          
-        })
-        
-    }*/
-    
-    public void desenharOvalLivremente(MouseEvent e, Color cor)
-    {
-        Graphics g = getGraphics ();  
-        g.setColor (cor);  
-        g.fillOval (e.getX (), e.getY (), 10, 10 );
-    }    
+                 
+            }
 
-   
-    public void desenharAposCliqueLabelLapis()
-    {
-    
+       
+        });
+        
+        
         painelDeDesenho.addMouseMotionListener(new MouseMotionListener() {
             
             @Override
-            public void mouseDragged(MouseEvent e) {
-                  if(flagDeDesenhoLabelLapis)
-                     desenharOvalLivremente(e,cor);
+            public void mouseDragged(MouseEvent arg0) {
+                
+               
             }
 
             @Override
@@ -326,78 +368,128 @@ public class FramePrincipal extends JFrame implements MouseListener, MouseMotion
                 
             }
         });
-        
-        painelDeDesenho.addMouseListener(new MouseListener() {
+    
+    }
+*/
+    
+    public void escutarEventoNaLabelSeta()
+    {
+        labelSeta.addMouseListener(new MouseAdapter() {
+            
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                 
+                flagDeDesenhoLabelSeta= true;
             }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                
-                if(flagDeDesenhoLabelLapis)
-                     desenharOvalLivremente(e,cor);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent arg0) {
-               
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent arg0) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent arg0) {
-
-            }
-
+        }); 
+        
+    }        
     
-    });        
+    public void escutarEventoNaLabelLapis()
+    {
+        labelLapis.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeDesenhoLabelLapis= true;
+            }
+        }); 
+        
+    }        
     
-  }
-
+    public void escutarEventoNaLabelPincel()
+    {
+        labelPincel.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeDesenhoLabelPincel= true;
+            }
+        }); 
+        
+    }  
+    
+    public void escutarEventoNaLabelBorracha()
+    {
+        labelBorracha.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeDesenhoLabelBorracha= true;
+            }
+        }); 
+        
+    }
+    
+    public void escutarEventoNaLabelTexto()
+    {
+        labelTexto.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeDesenhoLabelTexto= true;
+            }
+        }); 
+        
+    }   
+    
+    public void escutarEventoNaLabelLinha()
+    {
+        labelTexto.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeDesenhoLabelLinha= true;
+            }
+        }); 
+        
+    }        
    
-    
-    @Override
-    public void mouseClicked(MouseEvent e) {
+    public void escutarEventoNoBotaoBaldeDeTinta()
+    {
+        botaoBaldeDeTinta.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeDesenhoBotaoBaldeDeTinta = true;
+            }
+        }); 
         
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
+    }         
      
+    @Override
+    public void mouseClicked(MouseEvent arg0) {
+       
     }
 
     @Override
-    public void mouseExited(MouseEvent e) {
-     
+    public void mousePressed(MouseEvent arg0) {
+         
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
+    public void mouseReleased(MouseEvent arg0) {
         
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
-
+    public void mouseEntered(MouseEvent arg0) {
+        
     }
 
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+        
+    }
 
+    @Override
+    public void mouseDragged(MouseEvent arg0) {
+        
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent arg0) {
+
+    }
 
     
    
