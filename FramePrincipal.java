@@ -317,7 +317,6 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                System.out.println("Entrei aqui");
                 flagDeDesenhoLabelLinha= true;
                 labelLinha.setBackground(Color.GRAY);
                 
@@ -344,14 +343,18 @@ public class FramePrincipal extends JFrame implements ActionListener{
         
         Color cor;
         int posXActual, posYActual,posXAntiga, posYAntiga;
-        ArrayList<FiguraGeometrica> listaDeObjectosDesenhadosNaTela;
+        ArrayList<FiguraGeometrica>listaDeObjectosDesenhadosNaTela;
         boolean CliqueLabel;
-        FiguraGeometrica figura;
+       // FiguraGeometrica figura;
+         FiguraGeometrica figura;
         public AffineTransform aft;
         Graphics2D g2d;
+        boolean desenharTudo = true;
+        
+        int i = 0;
+        Thread thread;
         public PainelDeDesenho()
         {
-        
             this.addMouseListener(this);
             this.addMouseMotionListener(this);
             this.setBackground(new Color(255,255,255));
@@ -365,27 +368,24 @@ public class FramePrincipal extends JFrame implements ActionListener{
             escutarEventoNaLabelTexto();
             escutarEventoNaLabelLinha();
             escutarEventoNoBotaoBaldeDeTinta();
-
-
         }        
         
-        @Override
+         @Override
          public void paintComponent(Graphics g) {
              
            super.paintComponent(g);
            g2d = (Graphics2D) g;
            aft = g2d.getTransform();
            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-           if(listaDeObjectosDesenhadosNaTela!= null)
-                listaDeObjectosDesenhadosNaTela.forEach((objecto) -> {
-                    
-                    g2d.drawLine(posXAntiga, posYAntiga,posXActual,posYActual);
-                    g2d.setTransform(aft);
-                    
-                 });
-                        
+
+            listaDeObjectosDesenhadosNaTela.forEach((objecto) -> {
+                g2d.drawLine(objecto.getxPos(), objecto.getyPos(), objecto.getAltura(), objecto.getLargura());
+                g2d.setTransform(aft);
+            });
+            g2d.drawLine(posXAntiga, posYAntiga, posXActual, posYActual);
          }   
         
+       
         @Override
         public void actionPerformed(ActionEvent arg0) {
              
@@ -404,16 +404,29 @@ public class FramePrincipal extends JFrame implements ActionListener{
                 posXAntiga = posXActual = e.getX();
                 posYAntiga = posYActual = e.getY();  
                 repaint();
-            }    
+            }
+
+            
+            if(flagDeDesenhoLabelPincel)
+            {
+                posXAntiga = posXActual = e.getX();
+                posYAntiga = posYActual = e.getY(); 
+                repaint();
+                
+               /*posXAntiga = e.getX();
+               posYAntiga = e.getY();*/  
+                /*repaint();
+                desenharOvalLivremente(e);*/
+            }  
 
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
             
-            figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,2);
-            listaDeObjectosDesenhadosNaTela.add(figura);
-            System.out.println("QuantF: "+figura.getquantFiguras());
+           figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,2);
+           listaDeObjectosDesenhadosNaTela.add(figura);
+           repaint();
         }
 
         @Override
@@ -435,15 +448,33 @@ public class FramePrincipal extends JFrame implements ActionListener{
                posYAntiga = e.getY(); 
                repaint();
                aft = g2d.getTransform();
-               
-           }    
+           }
            
+           if(flagDeDesenhoLabelPincel)
+           {
+               /*posXAntiga = e.getX();
+               posYAntiga = e.getY(); 
+               repaint();*/
+               posXAntiga = e.getX();
+               posYAntiga = e.getY();
+               repaint();
+               /*desenharOvalLivremente(e);*/
+           }
         }
 
+        public void desenharOvalLivremente(MouseEvent e)
+        {
+            Graphics g = getGraphics ();  
+            g.setColor (Color.BLUE);  
+            g.fillOval (e.getX (), e.getY (), 10, 10 );
+        } 
+        
         @Override
         public void mouseMoved(MouseEvent arg0) {
              
         }
+        
+        
     
         
     }        
