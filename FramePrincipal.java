@@ -15,6 +15,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +23,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -41,7 +44,7 @@ import javax.swing.border.LineBorder;
  *
  * @author creuma
  */
-public class FramePrincipal extends JFrame implements ActionListener, MouseListener, MouseMotionListener{
+public class FramePrincipal extends JFrame implements ActionListener{
     
     JPanel painelIcones = new JPanel();
     JPanel painelDeDesenho = new JPanel();
@@ -68,8 +71,11 @@ public class FramePrincipal extends JFrame implements ActionListener, MouseListe
             ,flagDeDesenhoBotaoBaldeDeTinta;
     
     Color cor;
-    int posXInicial, posYInicial,posXFinal, posYFinal, numClique; 
+    int posXActual, posYActual,posXAntiga, posYAntiga;
+    Graphics2D g2;
      
+    PainelDeDesenho painelDesenho = new PainelDeDesenho();
+    
     public FramePrincipal() throws IOException
     {
         
@@ -85,7 +91,6 @@ public class FramePrincipal extends JFrame implements ActionListener, MouseListe
         adicionarPainelIcones();
         adicionarPainelDeDesenho();
         
-        
         adicionarIconesNoPainelIcones();
         
         efeitoHoverDaLabel(labelSeta);
@@ -94,21 +99,11 @@ public class FramePrincipal extends JFrame implements ActionListener, MouseListe
         efeitoHoverDaLabel(labelLinha);
         efeitoHoverDaLabel(labelPincel);
         efeitoHoverDaLabel(labelTexto);
+        efeitoHoverDoBotao(botaoBaldeDeTinta);   
         
-        efeitoHoverDoBotao(botaoBaldeDeTinta);
-        
-        escutarEventoNaLabelSeta();
-        escutarEventoNaLabelLapis();
-        escutarEventoNaLabelPincel();
-        escutarEventoNaLabelBorracha();
-        escutarEventoNaLabelTexto();
-        escutarEventoNaLabelLinha();
-        escutarEventoNoBotaoBaldeDeTinta();
-        
-        //desenharAposCliqueLabelLapis();
-        //desenharNoPainelDeDesenho();
+                
     }
-    
+      
     public static int larguraDimensaoDaTela(){
         
         Toolkit kit = Toolkit.getDefaultToolkit();
@@ -146,11 +141,8 @@ public class FramePrincipal extends JFrame implements ActionListener, MouseListe
     
     public void adicionarPainelDeDesenho()
     {
-        painelDeDesenho.setBackground(new Color(255,255,255));
-        painelDeDesenho.addMouseListener(this);
-        painelDeDesenho.addMouseMotionListener(this);
-        painelDeDesenho.setPreferredSize(new Dimension(300,300));
-        this.add(painelDeDesenho,BorderLayout.CENTER);
+        painelDesenho.setPreferredSize(new Dimension(300,300));
+        this.add(painelDesenho,BorderLayout.CENTER);
     }        
     
     public void fazerBotaoParecerLabel(JButton botao)
@@ -277,6 +269,7 @@ public class FramePrincipal extends JFrame implements ActionListener, MouseListe
             public void mouseClicked(MouseEvent arg0) {
                 System.out.println("Cliquei na label Lapis");
                 flagDeDesenhoLabelLapis= true;
+                
             }
         }); 
         
@@ -320,11 +313,14 @@ public class FramePrincipal extends JFrame implements ActionListener, MouseListe
     
     public void escutarEventoNaLabelLinha()
     {
-        labelTexto.addMouseListener(new MouseAdapter() {
+        labelLinha.addMouseListener(new MouseAdapter() {
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
+                System.out.println("Entrei aqui");
                 flagDeDesenhoLabelLinha= true;
+                labelLinha.setBackground(Color.GRAY);
+                
             }
         }); 
         
@@ -341,110 +337,116 @@ public class FramePrincipal extends JFrame implements ActionListener, MouseListe
         }); 
         
     }         
-     
-    
-    
-    public void desenharNoPainelDeDesenho(){
-    
-        painelDeDesenho.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                 
-            }
+  
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-                if(flagDeDesenhoLabelLapis)
-                     desenharOvalLivremente(e,cor);
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent arg0) {
-                
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent arg0) {
-               
-            }
-
-            @Override
-            public void mouseExited(MouseEvent arg0) {
-                 
-            }
-
-       
-        });
-        
-        
-        painelDeDesenho.addMouseMotionListener(new MouseMotionListener() {
-            
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                
-                  if(flagDeDesenhoLabelLapis)
-                     desenharOvalLivremente(e,cor);
-               
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent arg0) {
-                
-                
-            }
-        });
-    
-    }
-
-    public void desenharOvalLivremente(MouseEvent e, Color cor)
+    public class PainelDeDesenho extends JPanel implements ActionListener, MouseListener, MouseMotionListener
     {
-       Graphics2D g2d = (Graphics2D) getGraphics (); 
-       int xActual = e.getX ();
-       int yActual = e.getY();
-       
-       g2d.setColor (cor);  
-       g2d.drawLine(e.getX (), e.getY (), 5, 5);
-    }    
+        
+        Color cor;
+        int posXActual, posYActual,posXAntiga, posYAntiga;
+        ArrayList<FiguraGeometrica> listaDeObjectosDesenhadosNaTela;
+        boolean CliqueLabel;
+        FiguraGeometrica figura;
+        public AffineTransform aft;
+        Graphics2D g2d;
+        public PainelDeDesenho()
+        {
+        
+            this.addMouseListener(this);
+            this.addMouseMotionListener(this);
+            this.setBackground(new Color(255,255,255));
+            this.setPreferredSize(new Dimension(300,300));
+            listaDeObjectosDesenhadosNaTela = new ArrayList<FiguraGeometrica>();
+            
+            escutarEventoNaLabelSeta();
+            escutarEventoNaLabelLapis();
+            escutarEventoNaLabelPincel();
+            escutarEventoNaLabelBorracha();
+            escutarEventoNaLabelTexto();
+            escutarEventoNaLabelLinha();
+            escutarEventoNoBotaoBaldeDeTinta();
 
 
+        }        
+        
+        @Override
+         public void paintComponent(Graphics g) {
+             
+           super.paintComponent(g);
+           g2d = (Graphics2D) g;
+           aft = g2d.getTransform();
+           g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+           if(listaDeObjectosDesenhadosNaTela!= null)
+                listaDeObjectosDesenhadosNaTela.forEach((objecto) -> {
+                    
+                    g2d.drawLine(posXAntiga, posYAntiga,posXActual,posYActual);
+                    g2d.setTransform(aft);
+                    
+                 });
+                        
+         }   
+        
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+             
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent arg0) {
+           
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+            if(flagDeDesenhoLabelLinha)
+            {
+                posXAntiga = posXActual = e.getX();
+                posYAntiga = posYActual = e.getY();  
+                repaint();
+            }    
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            
+            figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,2);
+            listaDeObjectosDesenhadosNaTela.add(figura);
+            System.out.println("QuantF: "+figura.getquantFiguras());
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent arg0) {
+            
+        }
+
+        @Override
+        public void mouseExited(MouseEvent arg0) {
+            
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            
+           if(flagDeDesenhoLabelLinha) 
+           {
+               posXAntiga = e.getX();
+               posYAntiga = e.getY(); 
+               repaint();
+               aft = g2d.getTransform();
+               
+           }    
+           
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent arg0) {
+             
+        }
     
+        
+    }        
     
-    @Override
-    public void mouseClicked(MouseEvent arg0) {
-       
-    }
-
-    @Override
-    public void mousePressed(MouseEvent arg0) {
-         
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent arg0) {
-        
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent arg0) {
-        
-    }
-
-    @Override
-    public void mouseExited(MouseEvent arg0) {
-        
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent arg0) {
-        
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent arg0) {
-
-    }
-
    
 }
