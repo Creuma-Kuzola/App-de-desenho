@@ -26,13 +26,9 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -67,7 +63,6 @@ public class FramePrincipal extends JFrame implements ActionListener{
     JLabel labelPincel = new JLabel();  
     JLabel labelQuadrado = new JLabel();
     JLabel labelCirculo = new JLabel();
-    JLabel labelTriangulo = new JLabel();
    
     JButton botaoBaldeDeTinta = new JButton();  
     
@@ -106,7 +101,6 @@ public class FramePrincipal extends JFrame implements ActionListener{
         efeitoHoverDaLabel(labelLinha);
         efeitoHoverDaLabel(labelQuadrado);
         efeitoHoverDaLabel(labelCirculo);
-        efeitoHoverDaLabel(labelTriangulo);
         efeitoHoverDaLabel(labelPincel);
         efeitoHoverDaLabel(labelTexto);
         efeitoHoverDoBotao(botaoBaldeDeTinta);   
@@ -192,10 +186,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         
         labelCirculo.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/circle.png"));        
         labelCirculo.setCursor(cursor); 
-        
-        labelTriangulo.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/up-arrow_3.png"));        
-        labelTriangulo.setCursor(cursor); 
-
+       
         painelIcones.add(labelSeta);
         painelIcones.add(labelLapis);
         painelIcones.add(labelPincel); 
@@ -204,7 +195,6 @@ public class FramePrincipal extends JFrame implements ActionListener{
         painelIcones.add(labelLinha); 
         painelIcones.add(labelQuadrado); 
         painelIcones.add(labelCirculo);
-        painelIcones.add(labelTriangulo); 
         painelIcones.add(botaoBaldeDeTinta); 
       
         validate();
@@ -380,20 +370,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         
     } 
     
-    public void escutarEventoNaLabelTriangulo()
-    {
-        labelTriangulo.addMouseListener(new MouseAdapter() {
-            
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelTriangulo = true;
-            }
-        }); 
-        
-    }    
-  
-  
-
+   
     public class PainelDeDesenho extends JPanel implements ActionListener, MouseListener, MouseMotionListener
     {
         
@@ -424,6 +401,8 @@ public class FramePrincipal extends JFrame implements ActionListener{
             escutarEventoNaLabelTexto();
             escutarEventoNaLabelLinha();
             escutarEventoNoBotaoBaldeDeTinta();
+            escutarEventoNaLabelQuadrado();
+            escutarEventoNaLabelCirculo();
         }        
         
          @Override
@@ -434,14 +413,31 @@ public class FramePrincipal extends JFrame implements ActionListener{
            aft = g2d.getTransform();
            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-           if(flagDeDesenhoLabelLinha)
+           
+           if(flagDeDesenhoLabelQuadrado)
            {
+           
                listaDeObjectosDesenhadosNaTela.forEach((objecto) -> {
-                g2d.drawLine(objecto.getxPos(), objecto.getyPos(), objecto.getAltura(), objecto.getLargura());
-                g2d.setTransform(aft);
-            });
-            g2d.drawLine(posXAntiga, posYAntiga, posXActual, posYActual);
+                  g2d.fillRect(objecto.getxPos(), objecto.getyPos(), objecto.getAltura(), objecto.getLargura());
+                   g2d.setTransform(aft);
+               
+               });
+           
            }    
+           
+            /*//if(flagDeDesenhoLabelQuadrado){
+            listaDeObjectosDesenhadosNaTela.forEach((objecto) -> {
+             //g2d.drawLine(objecto.getxPos(), objecto.getyPos(), objecto.getAltura(), objecto.getLargura());
+              desenharFormas(objecto);
+              g2d.setTransform(aft);
+             });
+           
+           //}
+           /*if(flagDeDesenhoLabelLinha)
+           {
+               
+            g2d.drawLine(posXAntiga, posYAntiga, posXActual, posYActual);
+           }    */
             
            if(flagDeDesenhoLabelPincel){
            
@@ -488,14 +484,29 @@ public class FramePrincipal extends JFrame implements ActionListener{
                posYAntiga = e.getY();*/  
                 /*repaint();
                 desenharOvalLivremente(e);*/
-            }  
+            }
+            
+            if(flagDeDesenhoLabelQuadrado)
+            {
+                posXAntiga = posXActual = e.getX();
+                posYAntiga = posYActual = e.getY();  
+                repaint();
+            }
 
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
+           
+            if(flagDeDesenhoLabelLinha)
+                figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,1);
             
-           figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,2);
+            if(flagDeDesenhoLabelQuadrado)
+                figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,2);
+
+            if(flagDeDesenhoLabelCirculo)
+                figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,3);
+
            listaDeObjectosDesenhadosNaTela.add(figura);
            repaint();
         }
@@ -534,6 +545,15 @@ public class FramePrincipal extends JFrame implements ActionListener{
                repaint();
                /*desenharOvalLivremente(e);*/
            }
+           
+           if(flagDeDesenhoLabelQuadrado)
+           {
+               posXAntiga = e.getX();
+               posYAntiga = e.getY(); 
+               repaint();
+               aft = g2d.getTransform();
+
+           }    
         }
 
         public void desenharOvalLivremente(MouseEvent e)
@@ -548,9 +568,27 @@ public class FramePrincipal extends JFrame implements ActionListener{
              
         }
         
-        
-    
-        
+          
+        public void desenharFormas(FiguraGeometrica figura)
+        {
+           
+            /*g2d.setColor(figura.getCorFigura());*/
+                        
+            switch (figura.getForma()) {
+                
+                case 1:
+                    g2d.drawLine(figura.getxPos(), figura.getyPos(), figura.getAltura(), figura.getLargura());
+                    break;
+                case 2:
+                    g2d.fillRect(figura.getxPos(), figura.getyPos(), figura.getAltura(), figura.getLargura());
+                    break;
+                case 3:
+                    g2d.fillOval(figura.getxPos(), figura.getyPos(), figura.getAltura(), figura.getLargura());
+                    break;
+                                       
+            }
+            
+        }        
     }        
     
    
