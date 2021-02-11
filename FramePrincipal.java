@@ -116,7 +116,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         adicionarPainelIcones();
         adicionarPainelItensKeyframes();
         criarPainelTimeline();
-        //adicionarPainelDeDesenho();
+        adicionarPainelDeDesenho();
         
         adicionarIconesNoPainelIcones();
         adicionarIconesNoPainelItensKeyframes();
@@ -171,7 +171,8 @@ public class FramePrincipal extends JFrame implements ActionListener{
         file.setCursor(cursor);
         file.setFont(font);
         menuBar.add(file);
-        this.setJMenuBar(menuBar);
+        //this.setJMenuBar(menuBar);
+        this.add(menuBar, BorderLayout.NORTH);
     }        
   
     public void adicionarPainelIcones()
@@ -185,8 +186,8 @@ public class FramePrincipal extends JFrame implements ActionListener{
     
     public void adicionarPainelDeDesenho()
     {
-        painelDesenho.setPreferredSize(new Dimension(300,300));
-        this.add(painelDesenho,BorderLayout.CENTER);
+        painelDesenho.setPreferredSize(new Dimension(100,100));
+        this.add(painelDesenho, BorderLayout.CENTER);
     }        
     
     public void fazerBotaoParecerLabel(JButton botao)
@@ -532,13 +533,14 @@ public class FramePrincipal extends JFrame implements ActionListener{
     
     
     public void criarPainelTimeline(){
+        
         painelTimeline = new Timeline();
         JScrollPane scrollPane = new JScrollPane(painelTimeline);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setBounds(0, 460, larguraDimensaoDaTela(),100 );
+        scrollPane.setPreferredSize( new Dimension(larguraDimensaoDaTela(),100 ));
         scrollPane.setBackground(Color.BLACK);
-        this.add(scrollPane, BorderLayout.SOUTH);
+        this.add(scrollPane,BorderLayout.SOUTH);
     }
     
     public class PainelDeDesenho extends JPanel implements ActionListener, MouseListener, MouseMotionListener
@@ -559,7 +561,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
             this.addMouseListener(this);
             this.addMouseMotionListener(this);
             this.setBackground(new Color(255,255,255));
-            this.setPreferredSize(new Dimension(300,300));
+            this.setPreferredSize(new Dimension(100,300));
             listaDeObjectosDesenhadosNaTela = new ArrayList<FiguraGeometrica>();
             
             escutarEventoNaLabelSeta();
@@ -897,8 +899,8 @@ public class FramePrincipal extends JFrame implements ActionListener{
             for(int i = 0; i < this.listaDeFrames.size(); i++) {
                 
                 final ButtonFrames auxButton = new ButtonFrames();
-                auxButton.setMinimumSize(new Dimension(50,100));
-                auxButton.setMaximumSize(new Dimension(50,100));
+                auxButton.setMinimumSize(new Dimension(300,200));
+                auxButton.setMaximumSize(new Dimension(300,200));
                 auxButton.setAlignmentY(TOP_ALIGNMENT);
                 auxButton.setFont(new Font("Arial", Font.PLAIN, 10));
                 auxButton.id = i;
