@@ -1,10 +1,10 @@
+package applicacao.de.desenho;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package applicacao.de.desenho;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -13,7 +13,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -26,6 +25,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
@@ -44,9 +45,9 @@ import javax.swing.border.LineBorder;
  */
 public class FramePrincipal extends JFrame implements ActionListener{
     
-    JPanel painelIcones = new JPanel();
-    JPanel painelDeDesenho = new JPanel();
- 
+    JPanel painelIcones = new JPanel(); 
+    JPanel painelItensKeyFrames = new JPanel();
+    
     JMenuBar menuBar = new JMenuBar();
     JMenu file = new JMenu("File");
     
@@ -56,27 +57,43 @@ public class FramePrincipal extends JFrame implements ActionListener{
     Font font = new Font("Sans-Serif", Font.BOLD, 12);
    
     JLabel labelSeta = new JLabel();
-    JLabel labelLapis = new JLabel();
+    JLabel labelLimpar = new JLabel();
     JLabel labelBorracha = new JLabel();    
     JLabel labelLinha = new JLabel();  
     JLabel labelTexto = new JLabel();  
     JLabel labelPincel = new JLabel();  
     JLabel labelQuadrado = new JLabel();
     JLabel labelCirculo = new JLabel();
+    JLabel labelQuadradoRedondo = new JLabel();
+    
+    JLabel labelAdicionaKeyFrame = new JLabel();
+    JLabel labelPlayAnimacao = new JLabel();
+    JLabel labelBlankKeyframe = new JLabel();
+    JLabel labelAdicionarAnimacao = new JLabel();
+    JLabel labelRemoverAnimacao = new JLabel();
+    
+    
+    //JLabel labelKeyframes = new JLabel("Painel KeyFram");
+    
+    JButton setAnimation = new JButton();
+    JButton setKeyFrame = new JButton();
+    JButton play = new JButton();
    
     JButton botaoBaldeDeTinta = new JButton();  
     
-    boolean flagDeDesenhoLabelSeta, flagDeDesenhoLabelLapis, flagDeDesenhoLabelPincel
+    boolean flagDeDesenhoLabelSeta, flagDeDesenhoLabelLimpar, flagDeDesenhoLabelPincel
             ,flagDeDesenhoLabelBorracha, flagDeDesenhoLabelTexto,flagDeDesenhoLabelLinha
-            ,flagDeDesenhoBotaoBaldeDeTinta,flagDeDesenhoLabelQuadrado,flagDeDesenhoLabelCirculo,
-            flagDeDesenhoLabelTriangulo;
-    
+            ,flagDeDesenhoBotaoBaldeDeTinta,flagDeDesenhoLabelQuadrado,flagDeDesenhoLabelCirculo, flagDeDesenhoLabelQuadradoRedondo,
+            flagDeDesenhoLabelTriangulo, flagDeAnimacaolabelAdicionaKeyFrame,flagDeAnimacaolabelPlayAnimacao,
+            flagDeAnimacaolabelBlankKeyframe, flagDeAnimacaolabelAdicionarAnimacao,flagDeAnimacaolabelRemoverAnimacao;
+            
+    int formaGeometrica = 0;
     Color cor;
-    int posXActual, posYActual,posXAntiga, posYAntiga;
+    int posXAntiga, posYAntiga,posXActual, posYActual;
     Graphics2D g2;
      
     PainelDeDesenho painelDesenho = new PainelDeDesenho();
-    
+    Timeline painelTimeline = new Timeline();
     
     public FramePrincipal() throws IOException
     {
@@ -89,21 +106,46 @@ public class FramePrincipal extends JFrame implements ActionListener{
         this.setVisible(true);
         this.setLayout(new BorderLayout());
         
+       flagDeDesenhoLabelSeta = flagDeDesenhoLabelLimpar = flagDeDesenhoLabelPincel = flagDeDesenhoLabelBorracha =
+       flagDeDesenhoLabelTexto = flagDeDesenhoLabelLinha = flagDeDesenhoBotaoBaldeDeTinta = flagDeDesenhoLabelQuadrado =
+       flagDeDesenhoLabelCirculo = flagDeDesenhoLabelTriangulo = flagDeAnimacaolabelAdicionaKeyFrame = flagDeAnimacaolabelPlayAnimacao=
+        flagDeAnimacaolabelBlankKeyframe = flagDeAnimacaolabelAdicionarAnimacao = flagDeAnimacaolabelRemoverAnimacao = false;
+
+        
         adicionarMenu(); 
         adicionarPainelIcones();
-        adicionarPainelDeDesenho();
+        adicionarPainelItensKeyframes();
+        criarPainelTimeline();
+        //adicionarPainelDeDesenho();
         
         adicionarIconesNoPainelIcones();
+        adicionarIconesNoPainelItensKeyframes();
         
         efeitoHoverDaLabel(labelSeta);
         efeitoHoverDaLabel(labelBorracha);
-        efeitoHoverDaLabel(labelLapis);
+        efeitoHoverDaLabel(labelLimpar);
         efeitoHoverDaLabel(labelLinha);
         efeitoHoverDaLabel(labelQuadrado);
         efeitoHoverDaLabel(labelCirculo);
         efeitoHoverDaLabel(labelPincel);
         efeitoHoverDaLabel(labelTexto);
-        efeitoHoverDoBotao(botaoBaldeDeTinta);   
+        efeitoHoverDoBotao(botaoBaldeDeTinta); 
+        efeitoHoverDaLabel(labelQuadradoRedondo);
+        
+        efeitoHoverDaLabel(labelAdicionaKeyFrame);
+        efeitoHoverDaLabel(labelAdicionarAnimacao);
+        efeitoHoverDaLabel(labelBlankKeyframe);
+        efeitoHoverDaLabel(labelPlayAnimacao);
+        efeitoHoverDaLabel(labelRemoverAnimacao);
+        
+        escutarEventoNaLabelRemoverAnimacao();
+        escutarEventoNaLabelBlankKeyframe();
+        escutarEventoNaLabelPlayAnimacao();
+        escutarEventoNaLabelAdicionarAnimacao();
+        escutarEventoNaLabelAdicionaKeyFrame();
+        
+        
+        
     }
       
     public static int larguraDimensaoDaTela(){
@@ -137,7 +179,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         painelIcones.setBackground(new Color(211,211,211));
         painelIcones.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
         painelIcones.setBorder(border2);
-        painelIcones.setLayout(new GridLayout(13,0,1,0));
+        painelIcones.setLayout(new GridLayout(12,0,1,0));
         this.add(painelIcones,BorderLayout.WEST);
     }       
     
@@ -162,8 +204,8 @@ public class FramePrincipal extends JFrame implements ActionListener{
         labelSeta.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/diagonal-arrow1.png"));
         labelSeta.setCursor(cursor);
         
-        labelLapis.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/draw.png"));
-        labelLapis.setCursor(cursor);
+        labelLimpar.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/sweeping.png"));
+        labelLimpar.setCursor(cursor);
        
         labelBorracha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/rubber1.png"));
         labelBorracha.setCursor(cursor);     
@@ -187,18 +229,58 @@ public class FramePrincipal extends JFrame implements ActionListener{
         labelCirculo.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/circle.png"));        
         labelCirculo.setCursor(cursor); 
        
+        labelQuadradoRedondo.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/rounded-rectangle.png"));        
+        labelQuadradoRedondo.setCursor(cursor); 
+        
         painelIcones.add(labelSeta);
-        painelIcones.add(labelLapis);
+        painelIcones.add(labelLimpar);
         painelIcones.add(labelPincel); 
         painelIcones.add(labelBorracha); 
         painelIcones.add(labelTexto); 
         painelIcones.add(labelLinha); 
         painelIcones.add(labelQuadrado); 
+        painelIcones.add(labelQuadradoRedondo);
         painelIcones.add(labelCirculo);
         painelIcones.add(botaoBaldeDeTinta); 
       
         validate();
     }     
+    
+    public void adicionarIconesNoPainelItensKeyframes()
+    {
+       labelAdicionaKeyFrame.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/plus.png"));
+       labelAdicionaKeyFrame.setCursor(cursor);
+       
+       labelBlankKeyframe.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/blank-page.png"));
+       labelBlankKeyframe.setCursor(cursor);
+       
+       labelAdicionarAnimacao.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/button.png"));
+       labelAdicionarAnimacao.setCursor(cursor);
+       
+       labelRemoverAnimacao.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/delete.png"));
+       labelRemoverAnimacao.setCursor(cursor);
+       
+       labelPlayAnimacao.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/play-button-arrowhead.png"));
+       labelPlayAnimacao.setCursor(cursor);
+
+       painelItensKeyFrames.add(labelAdicionaKeyFrame);
+       painelItensKeyFrames.add(labelBlankKeyframe);
+       painelItensKeyFrames.add(labelAdicionarAnimacao);
+       painelItensKeyFrames.add(labelRemoverAnimacao);
+       painelItensKeyFrames.add(labelPlayAnimacao);
+       
+       validate();
+
+    }
+    
+    public void adicionarPainelItensKeyframes()
+    {
+        painelItensKeyFrames.setBackground(new Color(211,211,211));
+        painelItensKeyFrames.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
+        painelItensKeyFrames.setBorder(border2);
+        painelItensKeyFrames.setLayout(new GridLayout(12,0,1,0));
+        this.add(painelItensKeyFrames,BorderLayout.EAST);
+    }       
     
     public void efeitoHoverDaLabel(JLabel label)
     {
@@ -254,6 +336,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         if(e.getSource() == botaoBaldeDeTinta)
         {
             cor = JColorChooser.showDialog(this,"Escolha uma cor",Color.BLACK);
+            System.out.println("Cor: "+cor);
         }
     }
 
@@ -265,20 +348,21 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelSeta= true;
+                
+                flagDeDesenhoLabelSeta = !flagDeDesenhoLabelSeta;
             }
         }); 
         
     }        
     
-    public void escutarEventoNaLabelLapis()
+    public void escutarEventoNaLabelLimpar()
     {
-        labelLapis.addMouseListener(new MouseAdapter() {
+        labelLimpar.addMouseListener(new MouseAdapter() {
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelLapis= true;
                 
+                flagDeDesenhoLabelLimpar = !flagDeDesenhoLabelLimpar;
             }
         }); 
         
@@ -290,7 +374,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelPincel= true;
+                flagDeDesenhoLabelPincel= !flagDeDesenhoLabelPincel;
             }
         }); 
         
@@ -302,7 +386,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelBorracha= true;
+                flagDeDesenhoLabelBorracha = !flagDeDesenhoLabelBorracha;
             }
         }); 
         
@@ -314,7 +398,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelTexto= true;
+                flagDeDesenhoLabelTexto = !flagDeDesenhoLabelTexto;
             }
         }); 
         
@@ -326,9 +410,9 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelLinha= true;
-                labelLinha.setBackground(Color.GRAY);
                 
+                flagDeDesenhoLabelLinha = !flagDeDesenhoLabelLinha;
+                formaGeometrica = 1;
             }
         }); 
         
@@ -340,7 +424,8 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoBotaoBaldeDeTinta = true;
+                
+               flagDeDesenhoBotaoBaldeDeTinta = !flagDeDesenhoBotaoBaldeDeTinta;
             }
         }); 
         
@@ -352,7 +437,8 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelCirculo = true;
+                flagDeDesenhoLabelCirculo = !flagDeDesenhoLabelCirculo;
+                formaGeometrica = 3;
             }
         }); 
         
@@ -364,26 +450,108 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                flagDeDesenhoLabelQuadrado = true;
+                flagDeDesenhoLabelQuadrado = !flagDeDesenhoLabelQuadrado;
+                formaGeometrica = 2;
             }
         }); 
         
     } 
     
-   
+    public void escutarEventoNaLabelQuadradoRedondo()
+    {
+        labelQuadradoRedondo.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeDesenhoLabelQuadradoRedondo = !flagDeDesenhoLabelQuadradoRedondo;
+                formaGeometrica = 4;
+            }
+        }); 
+        
+    } 
+
+    public void escutarEventoNaLabelAdicionaKeyFrame()
+    {
+        labelAdicionaKeyFrame.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeAnimacaolabelAdicionaKeyFrame = !flagDeAnimacaolabelAdicionaKeyFrame;
+            }
+        }); 
+        
+    } 
+    
+    public void escutarEventoNaLabelAdicionarAnimacao()
+    {
+        labelAdicionarAnimacao.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeAnimacaolabelAdicionarAnimacao = !flagDeAnimacaolabelAdicionarAnimacao;
+            }
+        }); 
+        
+    } 
+    
+    public void escutarEventoNaLabelPlayAnimacao()
+    {
+        labelPlayAnimacao.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeAnimacaolabelPlayAnimacao = !flagDeAnimacaolabelPlayAnimacao;
+            }
+        }); 
+        
+    } 
+
+    public void escutarEventoNaLabelBlankKeyframe()
+    {
+        labelBlankKeyframe.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeAnimacaolabelBlankKeyframe = !flagDeAnimacaolabelBlankKeyframe;
+            }
+        }); 
+        
+    } 
+    
+    public void escutarEventoNaLabelRemoverAnimacao()
+    {
+        labelRemoverAnimacao.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeAnimacaolabelRemoverAnimacao = !flagDeAnimacaolabelRemoverAnimacao;
+            }
+        }); 
+        
+    }
+    
+    
+    public void criarPainelTimeline(){
+        painelTimeline = new Timeline();
+        JScrollPane scrollPane = new JScrollPane(painelTimeline);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setBounds(0, 460, larguraDimensaoDaTela(),100 );
+        scrollPane.setBackground(Color.BLACK);
+        this.add(scrollPane, BorderLayout.SOUTH);
+    }
+    
     public class PainelDeDesenho extends JPanel implements ActionListener, MouseListener, MouseMotionListener
     {
         
-        Color cor;
-        int posXActual, posYActual,posXAntiga, posYAntiga;
+        int posXAntiga, posYAntiga,posXActual, posYActual;
         ArrayList<FiguraGeometrica>listaDeObjectosDesenhadosNaTela;
         boolean CliqueLabel;
-       // FiguraGeometrica figura;
-         FiguraGeometrica figura;
+        FiguraGeometrica figura,figuraSelecionada;
         public AffineTransform aft;
         Graphics2D g2d;
         boolean desenharTudo = true;
-        
+
         int i = 0;
         Thread thread;
         public PainelDeDesenho()
@@ -395,7 +563,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
             listaDeObjectosDesenhadosNaTela = new ArrayList<FiguraGeometrica>();
             
             escutarEventoNaLabelSeta();
-            escutarEventoNaLabelLapis();
+            escutarEventoNaLabelLimpar();
             escutarEventoNaLabelPincel();
             escutarEventoNaLabelBorracha();
             escutarEventoNaLabelTexto();
@@ -403,8 +571,11 @@ public class FramePrincipal extends JFrame implements ActionListener{
             escutarEventoNoBotaoBaldeDeTinta();
             escutarEventoNaLabelQuadrado();
             escutarEventoNaLabelCirculo();
-        }        
-        
+            escutarEventoNaLabelQuadradoRedondo();
+            limparPainelDesenho();
+           
+        }
+
          @Override
          public void paintComponent(Graphics g) {
              
@@ -412,34 +583,45 @@ public class FramePrincipal extends JFrame implements ActionListener{
            g2d = (Graphics2D) g;
            aft = g2d.getTransform();
            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
            
-           if(flagDeDesenhoLabelQuadrado)
-           {
-           
-               listaDeObjectosDesenhadosNaTela.forEach((objecto) -> {
-                  g2d.fillRect(objecto.getxPos(), objecto.getyPos(), objecto.getAltura(), objecto.getLargura());
-                   g2d.setTransform(aft);
-               
-               });
-           
-           }    
-           
-            /*//if(flagDeDesenhoLabelQuadrado){
             listaDeObjectosDesenhadosNaTela.forEach((objecto) -> {
-             //g2d.drawLine(objecto.getxPos(), objecto.getyPos(), objecto.getAltura(), objecto.getLargura());
               desenharFormas(objecto);
               g2d.setTransform(aft);
              });
            
-           //}
-           /*if(flagDeDesenhoLabelLinha)
-           {
-               
-            g2d.drawLine(posXAntiga, posYAntiga, posXActual, posYActual);
-           }    */
+            if(!flagDeDesenhoLabelSeta){
             
-           if(flagDeDesenhoLabelPincel){
+             if (formaGeometrica == 1 || formaGeometrica == 2 || formaGeometrica == 3 || formaGeometrica
+                      == 4) {
+                 if (formaGeometrica == 1) {
+                    desenharFormas(new FiguraGeometrica(posXActual, posYActual, posXAntiga, posYAntiga,cor, formaGeometrica));
+                 } else {
+                    int x, y, largura, altura;
+
+                    if (posXAntiga < posXActual) {
+                        x = posXAntiga;
+                        largura = posXActual - posXAntiga;
+                    } else {
+                        x = posXActual;
+                        largura = posXAntiga - posXActual;
+                    }
+                    
+                    if (posYAntiga < posYActual) {
+                        y = posYAntiga;
+                        altura = posYActual - posYAntiga;
+                    } else {
+                        y = posYActual;
+                        altura = posYAntiga - posYActual;
+                    }
+
+                    desenharFormas(new FiguraGeometrica(x, y, largura, altura, cor, formaGeometrica));
+                 }
+                
+             }
+             
+          }   
+           
+          if(flagDeDesenhoLabelPincel){
            
                
            }
@@ -459,58 +641,122 @@ public class FramePrincipal extends JFrame implements ActionListener{
 
         @Override
         public void mousePressed(MouseEvent e) {
-
-            if(flagDeDesenhoLabelLinha)
-            {
-                posXAntiga = posXActual = e.getX();
-                posYAntiga = posYActual = e.getY();  
-                repaint();
-            }
-
             
-            if(flagDeDesenhoLabelPincel)
+            if(!flagDeDesenhoLabelSeta)
+            {    
+                posXActual = posXAntiga = e.getX();
+                posYActual = posYAntiga = e.getY(); 
+                repaint();
+            } 
+            else {
+
+                figuraSelecionada = null;
+                int x1 = e.getX();
+                int y1 = e.getY();
+                
+                for(FiguraGeometrica fg: listaDeObjectosDesenhadosNaTela)
+                { 
+                    int x2 = fg.getxPos();
+                    int y2 = fg.getyPos();
+                    
+                    if(fg.getForma() == 1)
+                    {
+                       if(x1 <= x2 && x1>= fg.getLargura())
+                        {
+                            if(y1<= y2 && y1 >= fg.getAltura())
+                            {
+                               figuraSelecionada = fg;
+                               break;
+
+                            }    
+                        }   
+                    
+                    }     
+                     
+                    else if(fg.getForma() != 1)
+                    {
+                        if(x1 >= x2 && x1<= x2+fg.getLargura())
+                        {
+                            if(y1 >= y2 && y1<= y2+fg.getAltura())
+                            {
+                               figuraSelecionada = fg;
+                               break;
+                            }    
+                        }
+                    } 
+                
+            }
+            
+       } 
+            
+       if(flagDeDesenhoLabelPincel)
+            {
+                
+             g2d.setColor(cor);  
+             g2d.fillOval (e.getX (), e.getY (), 10, 10 );
+            
+            }       
+            
+            /*if(flagDeDesenhoLabelPincel)
             {
                  desenharOvalLivremente(e);
                 
                 /*Graphics g = getGraphics ();  
                g.setColor (Color.BLUE);  
                g.fillOval (e.getX (), e.getY (), 10, 10 );
-
                 
-                /*posXAntiga = e.getX();
-                posYAntiga = e.getY(); 
+                /*posXActual = e.getX();
+                posYActual = e.getY(); 
                
-               /*posXAntiga = e.getX();
-               posYAntiga = e.getY();*/  
+               /*posXActual = e.getX();
+               posYActual = e.getY();*/  
                 /*repaint();
-                desenharOvalLivremente(e);*/
-            }
-            
-            if(flagDeDesenhoLabelQuadrado)
-            {
-                posXAntiga = posXActual = e.getX();
-                posYAntiga = posYActual = e.getY();  
-                repaint();
-            }
-
+                desenharOvalLivremente(e);
+            }*/
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-           
-            if(flagDeDesenhoLabelLinha)
-                figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,1);
             
-            if(flagDeDesenhoLabelQuadrado)
-                figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,2);
+            if(!flagDeDesenhoLabelSeta){
+            
+            if (formaGeometrica == 1 || formaGeometrica == 2 || formaGeometrica == 3 || formaGeometrica == 4) {
+                if (formaGeometrica == 1) {
+                    figura = new FiguraGeometrica(posXActual, posYActual, posXAntiga, posYAntiga,cor, formaGeometrica);
+                } else {
+                    
+                   int x, y, largura, altura;
+                   
+                   if (posXAntiga < posXActual) {
+                       x = posXAntiga;
+                       largura = posXActual - posXAntiga;
+                   } else {
+                       x = posXActual;
+                       largura = posXAntiga - posXActual;
+                   }
+                   
+                   if (posYAntiga < posYActual) {
+                       y = posYAntiga;
+                       altura = posYActual - posYAntiga;
+                   } else {
+                       y = posYActual;
+                       altura = posYAntiga - posYActual;
+                   }
 
-            if(flagDeDesenhoLabelCirculo)
-                figura = new FiguraGeometrica(posXAntiga, posYAntiga, posXActual, posYActual,cor,3);
-
-           listaDeObjectosDesenhadosNaTela.add(figura);
-           repaint();
+                   figura = new FiguraGeometrica(x, y, largura, altura, cor, formaGeometrica);
+                }
+                listaDeObjectosDesenhadosNaTela.add(figura);
+            }
+           
         }
-
+            
+            
+            
+            
+            
+       repaint(); 
+    }
+           
         @Override
         public void mouseEntered(MouseEvent arg0) {
             
@@ -524,15 +770,46 @@ public class FramePrincipal extends JFrame implements ActionListener{
         @Override
         public void mouseDragged(MouseEvent e) {
             
-           if(flagDeDesenhoLabelLinha) 
-           {
-               posXAntiga = e.getX();
-               posYAntiga = e.getY(); 
-               repaint();
-               aft = g2d.getTransform();
-           }
+            if(!flagDeDesenhoLabelSeta)
+            {    
+                posXActual = e.getX();
+                posYActual = e.getY(); 
+            }
+            else
+            {
+                if(figuraSelecionada!= null)
+                {
+                    if(figuraSelecionada.getForma() != 1)
+                    {
+                        figuraSelecionada.setxPos(e.getX());
+                        figuraSelecionada.setyPos(e.getY());
+                        repaint();
+                    }
+                    else if(figuraSelecionada.getForma()==1)
+                    {
+                        int largura = figuraSelecionada.getLargura() - figuraSelecionada.getxPos();
+                        int altura = figuraSelecionada.getAltura() - figuraSelecionada.getyPos();
+                        
+                        figuraSelecionada.setxPos(e.getX());
+                        figuraSelecionada.setyPos(e.getY());
+                        figuraSelecionada.setLargura(largura + figuraSelecionada.getxPos());
+                        figuraSelecionada.setAltura(altura + figuraSelecionada.getyPos());
+                        repaint();
+                    }    
+                }
+                                
+            }
+            repaint();
+            
+            if(flagDeDesenhoLabelPincel)
+            {
            
-           if(flagDeDesenhoLabelPincel)
+              g2d.setColor(cor);  
+              g2d.fillOval (e.getX (), e.getY (), 10, 10 );
+            
+            }    
+            
+           /*if(flagDeDesenhoLabelPincel)
            {
                desenharOvalLivremente(e);
                
@@ -540,20 +817,13 @@ public class FramePrincipal extends JFrame implements ActionListener{
                g.setColor (Color.BLUE);  
                g.fillOval (e.getX (), e.getY (), 10, 10 );
                
-             /*  posXActual = e.getX();
-               posYActual = e.getY();
+             /*  posXAntiga = e.getX();
+               posYAntiga = e.getY();
                repaint();
-               /*desenharOvalLivremente(e);*/
-           }
-           
-           if(flagDeDesenhoLabelQuadrado)
-           {
-               posXAntiga = e.getX();
-               posYAntiga = e.getY(); 
-               repaint();
-               aft = g2d.getTransform();
+               /*desenharOvalLivremente(e);
+           }*/
 
-           }    
+           
         }
 
         public void desenharOvalLivremente(MouseEvent e)
@@ -570,26 +840,81 @@ public class FramePrincipal extends JFrame implements ActionListener{
         
           
         public void desenharFormas(FiguraGeometrica figura)
-        {
-           
-            /*g2d.setColor(figura.getCorFigura());*/
-                        
+        {       
+            g2d.setColor(figura.getCorFigura());
+            
             switch (figura.getForma()) {
-                
                 case 1:
-                    g2d.drawLine(figura.getxPos(), figura.getyPos(), figura.getAltura(), figura.getLargura());
+                    g2d.drawLine(figura.getxPos(), figura.getyPos(), figura.getLargura(), figura.getAltura());
                     break;
                 case 2:
-                    g2d.fillRect(figura.getxPos(), figura.getyPos(), figura.getAltura(), figura.getLargura());
+                    g2d.fillRect(figura.getxPos(), figura.getyPos(), figura.getLargura(), figura.getAltura());
                     break;
                 case 3:
-                    g2d.fillOval(figura.getxPos(), figura.getyPos(), figura.getAltura(), figura.getLargura());
+                    g2d.fillOval(figura.getxPos(), figura.getyPos(), figura.getLargura(), figura.getAltura());
                     break;
-                                       
+                 case 4:   
+                      g2d.fillRoundRect(figura.getxPos(), figura.getyPos(), figura.getLargura(), figura.getAltura(),18,18);
+                    break;
             }
-            
+        }
+        
+        
+        public void limparPainelDesenho()
+        { 
+            if(flagDeDesenhoLabelLimpar)
+            {
+                listaDeObjectosDesenhadosNaTela.clear();
+            }    
+        
         }        
-    }        
+        
+    }
     
-   
+    public final class Timeline extends JPanel{
+    
+        public ArrayList<ButtonFrames> listaDeFrames;
+        public ArrayList<JLabel> containerDeLabel;
+         
+         public Timeline() {
+            super();
+            this.listaDeFrames = inicializarListaDeFrames();
+            this.setLayout(new BoxLayout(this, 0));
+            this.construirParteVisual();
+        }
+         
+        private ArrayList<ButtonFrames> inicializarListaDeFrames(){
+            ArrayList<ButtonFrames> lista = new ArrayList<>();
+            
+            for (int i = 0; i < 25; i++) {
+                lista.add(new ButtonFrames());
+            }
+        return lista;
+        
+        }
+        
+        public void construirParteVisual() {
+            for(int i = 0; i < this.listaDeFrames.size(); i++) {
+                
+                final ButtonFrames auxButton = new ButtonFrames();
+                auxButton.setMinimumSize(new Dimension(50,100));
+                auxButton.setMaximumSize(new Dimension(50,100));
+                auxButton.setAlignmentY(TOP_ALIGNMENT);
+                auxButton.setFont(new Font("Arial", Font.PLAIN, 10));
+                auxButton.id = i;
+                auxButton.setText("" + i);
+                
+                if (i % 5 == 0) {
+                    auxButton.setBackground(Color.decode("#41abc3"));
+                } else {
+                    auxButton.setBackground(new Color(255, 255, 255));
+                }    
+        }
+        
+    }    
+     
+  }
+
+
 }
+

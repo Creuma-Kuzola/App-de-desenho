@@ -17,8 +17,16 @@ public class FiguraGeometrica extends JPanel implements Runnable {
     boolean rotacionando = false;
     Thread thread;
     int cont =0;
+    public int posXAntiga, posYAntiga, posXActual, posYActual;
+    String string;
     
-    public FiguraGeometrica(int xPos, int yPos, int altura, int largura, Color corFigura, int forma) {
+    public FiguraGeometrica(int xPos, int yPos, int largura, int altura, Color corFigura, int forma) {
+        posXAntiga = xPos;
+        posYAntiga = yPos;
+        posXActual = largura;
+        posYActual = altura;
+
+        
         this.xPos = xPos;
         this.yPos = yPos;
         this.altura = altura;
@@ -27,6 +35,22 @@ public class FiguraGeometrica extends JPanel implements Runnable {
         this.forma = forma;
         this.cont++;
     }
+    
+    public FiguraGeometrica(String string, int xPos, int yPos, Color corFigura, int forma)
+    {
+        this.xPos = xPos;
+        this.yPos = yPos;
+        this.string = string;
+        this.corFigura = corFigura;
+        this.forma = forma;
+    
+    }        
+    
+    public FiguraGeometrica()
+    {
+    
+    
+    }        
     
     public int getxPos() {
         return xPos;
@@ -114,7 +138,14 @@ public class FiguraGeometrica extends JPanel implements Runnable {
         this.cont = c;
     }        
     
-  
+    public String getString() {
+        return string;
+    }
+
+    public void setString(String string) {
+        this.string = string;
+    }
+    
     
     @Override
     public void run() {
