@@ -7,6 +7,7 @@ package applicacao.de.desenho;
  */
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,6 +15,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -78,7 +80,6 @@ public class FramePrincipal extends JFrame implements ActionListener{
     JButton setAnimation = new JButton();
     JButton setKeyFrame = new JButton();
     JButton play = new JButton();
-   
     JButton botaoBaldeDeTinta = new JButton();  
     
     boolean flagDeDesenhoLabelSeta, flagDeDesenhoLabelLimpar, flagDeDesenhoLabelPincel
@@ -86,14 +87,17 @@ public class FramePrincipal extends JFrame implements ActionListener{
             ,flagDeDesenhoBotaoBaldeDeTinta,flagDeDesenhoLabelQuadrado,flagDeDesenhoLabelCirculo, flagDeDesenhoLabelQuadradoRedondo,
             flagDeDesenhoLabelTriangulo, flagDeAnimacaolabelAdicionaKeyFrame,flagDeAnimacaolabelPlayAnimacao,
             flagDeAnimacaolabelBlankKeyframe, flagDeAnimacaolabelAdicionarAnimacao,flagDeAnimacaolabelRemoverAnimacao;
-            
+    
     int formaGeometrica = 0;
     Color cor;
     int posXAntiga, posYAntiga,posXActual, posYActual;
     Graphics2D g2;
-     
+    int frameActualId = 0, inicioFimAnimacao = 1, inicioAnimacao,fimAnimacao; 
     PainelDeDesenho painelDesenho = new PainelDeDesenho();
-    Timeline painelTimeline = new Timeline();
+    Timeline painelTimeline;
+    boolean flagAnimacao = false, runningAnimacao = false;
+    Thread thread;
+    
     
     public FramePrincipal() throws IOException
     {
@@ -138,14 +142,6 @@ public class FramePrincipal extends JFrame implements ActionListener{
         efeitoHoverDaLabel(labelPlayAnimacao);
         efeitoHoverDaLabel(labelRemoverAnimacao);
         
-        escutarEventoNaLabelRemoverAnimacao();
-        escutarEventoNaLabelBlankKeyframe();
-        escutarEventoNaLabelPlayAnimacao();
-        escutarEventoNaLabelAdicionarAnimacao();
-        escutarEventoNaLabelAdicionaKeyFrame();
-        
-        
-        
     }
       
     public static int larguraDimensaoDaTela(){
@@ -180,7 +176,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         painelIcones.setBackground(new Color(211,211,211));
         painelIcones.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
         painelIcones.setBorder(border2);
-        painelIcones.setLayout(new GridLayout(12,0,1,0));
+        painelIcones.setLayout(new GridLayout(9,0,1,0));
         this.add(painelIcones,BorderLayout.WEST);
     }       
     
@@ -209,10 +205,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         labelLimpar.setCursor(cursor);
        
         labelBorracha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/rubber1.png"));
-        labelBorracha.setCursor(cursor);     
-        
-        labelLinha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/diagonal-line3.png"));
-        labelLinha.setCursor(cursor);     
+        labelBorracha.setCursor(cursor);    
         
         labelTexto.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/text.png"));
         labelTexto.setCursor(cursor);   
@@ -220,6 +213,10 @@ public class FramePrincipal extends JFrame implements ActionListener{
         labelPincel.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/paint-brush.png"));
         labelPincel.setCursor(cursor); 
         
+       
+        labelLinha.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/diagonal-line3.png"));
+        labelLinha.setCursor(cursor);     
+
         botaoBaldeDeTinta.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/paint-bucket1.png"));        
         botaoBaldeDeTinta.setCursor(cursor); 
         fazerBotaoParecerLabel(botaoBaldeDeTinta);
@@ -234,15 +231,15 @@ public class FramePrincipal extends JFrame implements ActionListener{
         labelQuadradoRedondo.setCursor(cursor); 
         
         painelIcones.add(labelSeta);
-        painelIcones.add(labelLimpar);
+       /* painelIcones.add(labelLimpar);
         painelIcones.add(labelPincel); 
         painelIcones.add(labelBorracha); 
-        painelIcones.add(labelTexto); 
+        painelIcones.add(labelTexto); */
         painelIcones.add(labelLinha); 
-        painelIcones.add(labelQuadrado); 
-        painelIcones.add(labelQuadradoRedondo);
-        painelIcones.add(labelCirculo);
         painelIcones.add(botaoBaldeDeTinta); 
+        painelIcones.add(labelQuadrado);
+        painelIcones.add(labelCirculo);
+        painelIcones.add(labelQuadradoRedondo);
       
         validate();
     }     
@@ -252,22 +249,22 @@ public class FramePrincipal extends JFrame implements ActionListener{
        labelAdicionaKeyFrame.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/plus.png"));
        labelAdicionaKeyFrame.setCursor(cursor);
        
-       labelBlankKeyframe.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/blank-page.png"));
-       labelBlankKeyframe.setCursor(cursor);
+       /*labelBlankKeyframe.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/blank-page.png"));
+       labelBlankKeyframe.setCursor(cursor);*/
        
        labelAdicionarAnimacao.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/button.png"));
        labelAdicionarAnimacao.setCursor(cursor);
        
-       labelRemoverAnimacao.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/delete.png"));
-       labelRemoverAnimacao.setCursor(cursor);
+       /*labelRemoverAnimacao.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/delete.png"));
+       labelRemoverAnimacao.setCursor(cursor);*/
        
        labelPlayAnimacao.setIcon(new ImageIcon("/home/creuma/NetBeansProjects/Applicacao de desenho/src/applicacao/de/desenho/play-button-arrowhead.png"));
        labelPlayAnimacao.setCursor(cursor);
 
        painelItensKeyFrames.add(labelAdicionaKeyFrame);
-       painelItensKeyFrames.add(labelBlankKeyframe);
        painelItensKeyFrames.add(labelAdicionarAnimacao);
-       painelItensKeyFrames.add(labelRemoverAnimacao);
+       //painelItensKeyFrames.add(labelBlankKeyframe);
+       //painelItensKeyFrames.add(labelRemoverAnimacao);
        painelItensKeyFrames.add(labelPlayAnimacao);
        
        validate();
@@ -279,7 +276,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         painelItensKeyFrames.setBackground(new Color(211,211,211));
         painelItensKeyFrames.setPreferredSize(new Dimension(40,alturaDimensaoDaTela()));
         painelItensKeyFrames.setBorder(border2);
-        painelItensKeyFrames.setLayout(new GridLayout(12,0,1,0));
+        painelItensKeyFrames.setLayout(new GridLayout(9,0,1,0));
         this.add(painelItensKeyFrames,BorderLayout.EAST);
     }       
     
@@ -471,67 +468,6 @@ public class FramePrincipal extends JFrame implements ActionListener{
         
     } 
 
-    public void escutarEventoNaLabelAdicionaKeyFrame()
-    {
-        labelAdicionaKeyFrame.addMouseListener(new MouseAdapter() {
-            
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                flagDeAnimacaolabelAdicionaKeyFrame = !flagDeAnimacaolabelAdicionaKeyFrame;
-            }
-        }); 
-        
-    } 
-    
-    public void escutarEventoNaLabelAdicionarAnimacao()
-    {
-        labelAdicionarAnimacao.addMouseListener(new MouseAdapter() {
-            
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                flagDeAnimacaolabelAdicionarAnimacao = !flagDeAnimacaolabelAdicionarAnimacao;
-            }
-        }); 
-        
-    } 
-    
-    public void escutarEventoNaLabelPlayAnimacao()
-    {
-        labelPlayAnimacao.addMouseListener(new MouseAdapter() {
-            
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                flagDeAnimacaolabelPlayAnimacao = !flagDeAnimacaolabelPlayAnimacao;
-            }
-        }); 
-        
-    } 
-
-    public void escutarEventoNaLabelBlankKeyframe()
-    {
-        labelBlankKeyframe.addMouseListener(new MouseAdapter() {
-            
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                flagDeAnimacaolabelBlankKeyframe = !flagDeAnimacaolabelBlankKeyframe;
-            }
-        }); 
-        
-    } 
-    
-    public void escutarEventoNaLabelRemoverAnimacao()
-    {
-        labelRemoverAnimacao.addMouseListener(new MouseAdapter() {
-            
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                flagDeAnimacaolabelRemoverAnimacao = !flagDeAnimacaolabelRemoverAnimacao;
-            }
-        }); 
-        
-    }
-    
-    
     public void criarPainelTimeline(){
         
         painelTimeline = new Timeline();
@@ -543,7 +479,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         this.add(scrollPane,BorderLayout.SOUTH);
     }
     
-    public class PainelDeDesenho extends JPanel implements ActionListener, MouseListener, MouseMotionListener
+    public class PainelDeDesenho extends JPanel implements ActionListener, MouseListener, MouseMotionListener, Runnable
     {
         
         int posXAntiga, posYAntiga,posXActual, posYActual;
@@ -554,7 +490,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
         Graphics2D g2d;
         boolean desenharTudo = true;
 
-        int i = 0;
+        //int i = 0;
         Thread thread;
         public PainelDeDesenho()
         {
@@ -575,7 +511,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
             escutarEventoNaLabelCirculo();
             escutarEventoNaLabelQuadradoRedondo();
             limparPainelDesenho();
-           
+            
         }
 
          @Override
@@ -586,10 +522,12 @@ public class FramePrincipal extends JFrame implements ActionListener{
            aft = g2d.getTransform();
            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
            
-            listaDeObjectosDesenhadosNaTela.forEach((objecto) -> {
+           painelTimeline.getListaDeFrames().get(frameActualId).getListaDeDesenhosNesteFrame().forEach((objecto) ->{
+               
               desenharFormas(objecto);
               g2d.setTransform(aft);
-             });
+              
+           });
            
             if(!flagDeDesenhoLabelSeta){
             
@@ -623,12 +561,9 @@ public class FramePrincipal extends JFrame implements ActionListener{
              
           }   
            
-          if(flagDeDesenhoLabelPincel){
+
            
-               
-           }
-           
-         }   
+      }   
         
        
         @Override
@@ -656,7 +591,7 @@ public class FramePrincipal extends JFrame implements ActionListener{
                 int x1 = e.getX();
                 int y1 = e.getY();
                 
-                for(FiguraGeometrica fg: listaDeObjectosDesenhadosNaTela)
+                for(FiguraGeometrica fg : painelTimeline.getListaDeFrames().get(frameActualId).listaDeDesenhosNesteFrame)
                 { 
                     int x2 = fg.getxPos();
                     int y2 = fg.getyPos();
@@ -724,7 +659,10 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             if (formaGeometrica == 1 || formaGeometrica == 2 || formaGeometrica == 3 || formaGeometrica == 4) {
                 if (formaGeometrica == 1) {
-                    figura = new FiguraGeometrica(posXActual, posYActual, posXAntiga, posYAntiga,cor, formaGeometrica);
+                    for(int i = frameActualId; i < 31; i++)
+                    {
+                        painelTimeline.getListaDeFrames().get(i).listaDeDesenhosNesteFrame.add(new FiguraGeometrica(posXActual, posYActual, posXAntiga, posYAntiga,cor, formaGeometrica));
+                    }
                 } else {
                     
                    int x, y, largura, altura;
@@ -744,17 +682,15 @@ public class FramePrincipal extends JFrame implements ActionListener{
                        y = posYActual;
                        altura = posYAntiga - posYActual;
                    }
-
-                   figura = new FiguraGeometrica(x, y, largura, altura, cor, formaGeometrica);
+                   for(int i = frameActualId; i < 31; i++)
+                    {
+                        painelTimeline.getListaDeFrames().get(i).listaDeDesenhosNesteFrame.add(new FiguraGeometrica(x, y, largura, altura, cor, formaGeometrica));
+                    }
                 }
-                listaDeObjectosDesenhadosNaTela.add(figura);
+                    
             }
            
         }
-            
-            
-            
-            
             
        repaint(); 
     }
@@ -805,7 +741,6 @@ public class FramePrincipal extends JFrame implements ActionListener{
             
             if(flagDeDesenhoLabelPincel)
             {
-           
               g2d.setColor(cor);  
               g2d.fillOval (e.getX (), e.getY (), 10, 10 );
             
@@ -870,12 +805,41 @@ public class FramePrincipal extends JFrame implements ActionListener{
             }    
         
         }        
+
+        @Override
+        public void run() {
+            try {
+                
+                while(runningAnimacao) {
+                    
+                    Thread.sleep(1000/24);
+                    repaint();
+                    frameActualId++;
+                    
+                    if (frameActualId >= 30) {
+                        frameActualId = 0;
+                        thread.interrupt();
+                        runningAnimacao = false;
+                        thread.interrupt();
+                        break;
+                    }
+                }
+            } catch (InterruptedException e) {
+                System.out.println("");
+            }
+        }
+
+        private void startAnimation() {
+            runningAnimacao = true;
+             thread = new Thread(this);
+             thread.start();
+        }
         
     }
     
     public final class Timeline extends JPanel{
     
-        public ArrayList<ButtonFrames> listaDeFrames;
+        private ArrayList<ButtonFrames> listaDeFrames;
         public ArrayList<JLabel> containerDeLabel;
          
          public Timeline() {
@@ -883,12 +847,18 @@ public class FramePrincipal extends JFrame implements ActionListener{
             this.listaDeFrames = inicializarListaDeFrames();
             this.setLayout(new BoxLayout(this, 0));
             this.construirParteVisual();
+            
+            escutarEventoNaLabelRemoverAnimacao();
+            escutarEventoNaLabelBlankKeyframe();
+            escutarEventoNaLabelPlayAnimacao();
+            escutarEventoNaLabelAdicionarAnimacao();
+            escutarEventoNaLabelAdicionaKeyFrame();
         }
          
         private ArrayList<ButtonFrames> inicializarListaDeFrames(){
             ArrayList<ButtonFrames> lista = new ArrayList<>();
             
-            for (int i = 0; i < 25; i++) {
+            for (int i = 0; i < 31; i++) {
                 lista.add(new ButtonFrames());
             }
         return lista;
@@ -896,27 +866,197 @@ public class FramePrincipal extends JFrame implements ActionListener{
         }
         
         public void construirParteVisual() {
-            for(int i = 0; i < this.listaDeFrames.size(); i++) {
+            for(int i = 0; i < 31; i++) {
                 
                 final ButtonFrames auxButton = new ButtonFrames();
-                auxButton.setMinimumSize(new Dimension(300,200));
-                auxButton.setMaximumSize(new Dimension(300,200));
+                auxButton.setMinimumSize(new Dimension(50,100));
+                auxButton.setMaximumSize(new Dimension(50,100));
                 auxButton.setAlignmentY(TOP_ALIGNMENT);
                 auxButton.setFont(new Font("Arial", Font.PLAIN, 10));
                 auxButton.id = i;
                 auxButton.setText("" + i);
                 
+            
+                auxButton.addActionListener((ActionEvent e) ->{
+                    ButtonFrames auxFrame = (ButtonFrames) e.getSource();
+                    frameActualId = auxFrame.getID();
+                    painelDesenho.repaint();
+                    System.out.println("FrameActual: "+frameActualId);
+                    
+                    if (flagAnimacao && auxFrame.isKeyFrame()) {
+                        if (inicioFimAnimacao== 1) {
+                            inicioAnimacao = auxFrame.getID();
+                            auxFrame.setInicioAnimation(auxFrame.getID());
+                            inicioFimAnimacao++;
+                        } else {
+                            if (inicioAnimacao != auxFrame.getID()) {
+                               fimAnimacao = auxButton.getID();
+                               auxButton.setFimAnimation(auxButton.getID());
+                               flagAnimacao = false;
+                               buildMoveAnimation();
+                               inicioFimAnimacao = 1;
+                            }
+                        }
+                    } 
+                
+                });
+               
                 if (i % 5 == 0) {
-                    auxButton.setBackground(Color.decode("#41abc3"));
+                    auxButton.setBackground(Color.gray);
                 } else {
-                    auxButton.setBackground(new Color(255, 255, 255));
-                }    
+                    auxButton.setBackground(Color.decode("#ffffff"));
+                }   
+                
+                this.add(auxButton);
+            }
+        
+         }    
+
+        public ArrayList<ButtonFrames> getListaDeFrames() {
+            return listaDeFrames;
+        }
+
+        public void setListaDeFrames(ArrayList<ButtonFrames> listaDeFrames) {
+            this.listaDeFrames = listaDeFrames;
         }
         
-    }    
-     
-  }
+          
+    public void escutarEventoNaLabelAdicionaKeyFrame()
+    {
+        labelAdicionaKeyFrame.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                
+                try {
+                    
+                    Component component = painelTimeline.getComponent(frameActualId);
+                    JButton botaoKeyFrame = (ButtonFrames) component;
+
+                    botaoKeyFrame.setBackground(Color.decode("#EDE21F"));
+                    ButtonFrames auxFrame = (ButtonFrames) component;
+
+                    auxFrame.setKeyFrame(true);
+                    painelTimeline.getListaDeFrames().get(frameActualId).setKeyFrame(true);
+                
+                } 
+                catch (Exception evento) {
+                    
+                    System.out.println("Errrooooooo: " + evento.toString());
+            }
+                
+                
+            }
+        }); 
+        
+    } 
+    
+    public void escutarEventoNaLabelAdicionarAnimacao()
+    {
+        labelAdicionarAnimacao.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                
+                flagAnimacao = true;
+            }
+        }); 
+        
+    } 
+    
+    public void escutarEventoNaLabelPlayAnimacao()
+    {
+        labelPlayAnimacao.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                
+                painelDesenho.startAnimation();
+                
+            }
+        }); 
+        
+    } 
+
+    public void escutarEventoNaLabelBlankKeyframe()
+    {
+        labelBlankKeyframe.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeAnimacaolabelBlankKeyframe = !flagDeAnimacaolabelBlankKeyframe;
+            }
+        }); 
+        
+    } 
+    
+    public void escutarEventoNaLabelRemoverAnimacao()
+    {
+        labelRemoverAnimacao.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                flagDeAnimacaolabelRemoverAnimacao = !flagDeAnimacaolabelRemoverAnimacao;
+            }
+        }); 
+        
+    }
+    
+    public void buildMoveAnimation(){
+    
+        if (flagAnimacao == false) {
+            final int startIndexFrame = inicioAnimacao;
+            final int endIndexFrame = fimAnimacao;
+            int actualIndexFrame;
+
+            ButtonFrames startFrame = (ButtonFrames ) painelTimeline.listaDeFrames.get(startIndexFrame);
+            ButtonFrames endFrame = (ButtonFrames ) painelTimeline.listaDeFrames.get(endIndexFrame);
+            System.out.println(startFrame.listaDeDesenhosNesteFrame.size());    
+            System.out.println(endFrame.listaDeDesenhosNesteFrame.size());
+            
+            final int quantFormasGeometricas = endFrame.listaDeDesenhosNesteFrame.size() >= 
+                    startFrame.listaDeDesenhosNesteFrame.size() ? startFrame.listaDeDesenhosNesteFrame.size() : 
+                    endFrame.listaDeDesenhosNesteFrame.size();
+
+            final ArrayList<FiguraGeometrica> listaDeFiguras = endFrame.listaDeDesenhosNesteFrame.size() >= 
+                    startFrame.listaDeDesenhosNesteFrame.size() ?
+                    startFrame.listaDeDesenhosNesteFrame : endFrame.listaDeDesenhosNesteFrame;
 
 
+            for (actualIndexFrame = inicioAnimacao + 1; actualIndexFrame < endIndexFrame; actualIndexFrame++) {
+                final ButtonFrames  frameActual = (ButtonFrames) painelTimeline.getComponent(actualIndexFrame);
+                final JButton representacaoVisualFrame = (JButton) painelTimeline.getComponent(actualIndexFrame);
+                final int percentagemDeDeslocamento = (actualIndexFrame * 100) / endIndexFrame;
+
+                for (int figuraActualIndex = 0; figuraActualIndex < quantFormasGeometricas; figuraActualIndex++) {
+                    if (frameActual.listaDeDesenhosNesteFrame.isEmpty())
+                    {
+                        for(FiguraGeometrica fg: listaDeFiguras)
+                        {
+                            frameActual.listaDeDesenhosNesteFrame.add(new FiguraGeometrica(fg.getxPos(),fg.getyPos(),fg.getLargura(),fg.getAltura(),fg.getCorFigura(),fg.getForma()));
+                        }    
+                    }    
+                        
+                    final int posicaoFinalX = endFrame.listaDeDesenhosNesteFrame.get(figuraActualIndex).getxPos();
+                    final int posicaoFinalY = endFrame.listaDeDesenhosNesteFrame.get(figuraActualIndex).getyPos();
+                    final int novoPontoX = (percentagemDeDeslocamento * posicaoFinalX) / 100;
+                    final int novoPontoY = (percentagemDeDeslocamento * posicaoFinalY) / 100;
+
+                    frameActual.listaDeDesenhosNesteFrame.get(figuraActualIndex).setxPos(novoPontoX);
+                    frameActual.listaDeDesenhosNesteFrame.get(figuraActualIndex).setyPos(novoPontoY);
+                }
+
+                representacaoVisualFrame.setEnabled(false);
+                representacaoVisualFrame.setBackground(Color.pink);
+            }
+        }
+    }
+    
+          
+    }
+    
+    
 }
+    
+
 
